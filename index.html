@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
 <style>
-/* Layout: rubrik överst, mätare till vänster och lejon + avläsning till höger på bred skärm, staplat på mobil */
+/* Layout: rubrik och gängknapp överst, flikar under. Mätarfliken har mätare till vänster och lejon + avläsning till höger på bred skärm */
 :root{
   --h:150;
   --font-display:"Fredoka","Arial Rounded MT Bold",system-ui,sans-serif;
@@ -49,14 +49,15 @@ body{
   display:flex;justify-content:center;overflow-x:hidden;
   -webkit-tap-highlight-color:transparent;
 }
-.app{width:100%;max-width:980px;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;z-index:1}
+[hidden]{display:none!important}
+.app{width:100%;max-width:980px;display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;z-index:1}
 h1{
   margin:0;display:flex;justify-content:center;
   font:700 clamp(44px,12vw,84px)/1 var(--font-display);
   text-shadow:3px 4px 0 var(--pill);
 }
 h1 span{display:inline-block;will-change:transform}
-.hint{margin:0;transition:opacity .5s;font-size:15px}
+.hint{margin:0;transition:opacity .5s;font-size:15px;text-align:center}
 .hint.gone{opacity:0}
 .stage{width:100%;display:grid;gap:14px;grid-template-columns:minmax(0,1fr);justify-items:center;align-items:center}
 @media (min-width:820px){.stage{grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:28px}}
@@ -105,6 +106,8 @@ button{
 button:hover{background:var(--pill)}
 button:active{transform:translateY(4px);box-shadow:0 0 0 var(--line)}
 button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
+button.pri{background:var(--pill)}
+button.small{font-size:15px;padding:5px 12px;border-radius:11px;box-shadow:0 3px 0 var(--line)}
 .sync{margin:0;display:flex;align-items:center;gap:8px;font-size:14px;text-align:center}
 .sync::before{content:"";flex:none;width:10px;height:10px;border-radius:50%;background:#9a8f86;border:2px solid var(--line)}
 .sync.live::before{background:#2fd16a;animation:blink 1.6s ease-in-out infinite}
@@ -117,13 +120,98 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
 .bg i:nth-child(4){width:90px;height:90px;left:12%;bottom:6%;animation-delay:-2s}
 .bg i:nth-child(5){width:140px;height:140px;left:46%;bottom:-40px;animation-delay:-6s}
 #fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+
+/* Gängknapp och flikar */
+.gangPill{display:flex;align-items:center;gap:8px;font-size:17px;padding:6px 16px;border-radius:999px;max-width:100%}
+.gangPill b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60vw}
+.tabs{display:flex;gap:4px;background:var(--paper);border:3px solid var(--line);border-radius:999px;padding:5px;box-shadow:0 4px 0 var(--line);max-width:100%;overflow-x:auto;scrollbar-width:none;margin-bottom:6px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:0;box-shadow:none;border-radius:999px;padding:8px 16px;font-size:16px;background:transparent;white-space:nowrap}
+.tab:active{transform:none}
+.tab[aria-selected="true"]{background:var(--pill)}
+@media (max-width:460px){.tabs{width:100%;box-sizing:border-box;gap:2px;padding:4px}.tab{flex:1;padding:8px 6px;font-size:14.5px}}
+.panel{width:100%;display:flex;flex-direction:column;align-items:center;gap:16px}
+
+/* Kort i flikarna */
+.card{
+  --line:#1d1424;
+  width:100%;max-width:620px;box-sizing:border-box;background:var(--paper);color:#1d1424;
+  border:3px solid #1d1424;border-radius:20px;padding:16px 18px;box-shadow:0 5px 0 #1d1424;
+}
+.card h2{margin:0 0 6px;font:700 24px/1.15 var(--font-display);overflow-wrap:anywhere}
+.kicker{margin:0;font-size:13px;text-transform:uppercase;letter-spacing:.06em;opacity:.7}
+.muted{margin:6px 0 0;font-size:14px;opacity:.75}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.between{justify-content:space-between;margin-top:0}
+.field{
+  font:800 16px var(--font-body);color:#1d1424;background:#fff;border:3px solid #1d1424;
+  border-radius:12px;padding:9px 12px;min-width:0;flex:1 1 180px;
+}
+.field:focus{outline:3px dashed #1d1424;outline-offset:2px}
+
+/* Personlig mätare */
+input.lvl{
+  -webkit-appearance:none;appearance:none;width:100%;height:24px;margin:16px 0 14px;border-radius:99px;
+  border:3px solid #1d1424;box-sizing:border-box;cursor:pointer;touch-action:pan-y;
+  background:linear-gradient(90deg,hsl(215 88% 58%),hsl(172 88% 58%),hsl(125 88% 58%),hsl(48 88% 58%),hsl(28 88% 58%),hsl(6 88% 58%),hsl(335 88% 58%));
+}
+input.lvl::-webkit-slider-thumb{-webkit-appearance:none;width:36px;height:36px;border-radius:50%;background:#fff;border:3px solid #1d1424;box-shadow:0 3px 0 #1d1424}
+input.lvl::-moz-range-thumb{width:30px;height:30px;border-radius:50%;background:#fff;border:3px solid #1d1424;box-shadow:0 3px 0 #1d1424}
+input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
+.card .num{font-size:42px}
+.card .name{font-size:19px}
+
+/* Topplista */
+.lb{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.lbRow{display:grid;grid-template-columns:2.2em minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 10px;border:2.5px solid #1d1424;border-radius:14px;background:#fff}
+.lbRow.me{background:hsl(var(--h) 90% 88%)}
+.rank{font:700 22px var(--font-display);text-align:center}
+.lbName{display:flex;gap:6px;align-items:baseline;flex-wrap:wrap;min-width:0}
+.lbName b{font:700 18px var(--font-display);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.lbName small{font-size:12px;opacity:.7}
+.bar{height:12px;margin-top:4px;border:2px solid #1d1424;border-radius:99px;background:#f3ece0;overflow:hidden}
+.bar span{display:block;height:100%;border-radius:99px;transition:width .4s}
+.lbNum{font:700 26px var(--font-display);font-variant-numeric:tabular-nums;min-width:2ch;text-align:right}
+.empty{padding:14px;text-align:center;border:2.5px dashed #1d1424;border-radius:14px;opacity:.8}
+.tag{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;background:var(--pill);border:2px solid #1d1424}
+
+/* Gänglista */
+.glist{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.gitem{display:flex;gap:8px;align-items:center;padding:8px 10px;border:2.5px solid #1d1424;border-radius:14px;background:#fff}
+.gitem .gn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 18px var(--font-display)}
+.gitem.cur{background:hsl(var(--h) 90% 88%)}
+
+/* Lejonchatt */
+.chatCard{display:flex;flex-direction:column;gap:10px}
+.chatHead{display:flex;align-items:center;gap:12px}
+.ava{flex:none;width:44px;height:44px;border-radius:50%;background:var(--fur);border:3px solid #1d1424;display:grid;place-items:center;font-size:24px}
+.chatLog{height:min(50vh,430px);overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:10px;border:2.5px solid #1d1424;border-radius:16px;background:#fff;overscroll-behavior:contain}
+.msg{max-width:85%;padding:9px 13px;border:2.5px solid #1d1424;border-radius:16px;overflow-wrap:anywhere;animation:pop .3s cubic-bezier(.3,1.8,.5,1)}
+.msg.me{align-self:flex-end;background:var(--pill);border-bottom-right-radius:5px}
+.msg.lion{align-self:flex-start;background:#fff3dc;border-bottom-left-radius:5px}
+.typing{display:inline-flex;gap:5px;padding:4px 2px}
+.typing i{width:8px;height:8px;border-radius:50%;background:#1d1424;opacity:.4;animation:dot 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-size:14px;padding:5px 12px;border-radius:99px;box-shadow:0 3px 0 #1d1424;border-width:2.5px}
+
+/* Toast */
+.toast{
+  position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:10;
+  transform:translate(-50%,24px);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;
+  background:#1d1424;color:#fff;padding:10px 18px;border-radius:14px;max-width:min(90vw,460px);text-align:center;
+  border:3px solid #fff4e6;
+}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
 @keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(30px,-44px) scale(1.15)}}
 @keyframes pop{0%{transform:scale(.85)}100%{transform:scale(1)}}
 @keyframes boop{0%{transform:scale(1)}30%{transform:scale(1.1,.86)}60%{transform:scale(.94,1.08)}100%{transform:scale(1)}}
 @keyframes zzz{0%{opacity:0;transform:translate(0,8px)}20%{opacity:1}100%{opacity:0;transform:translate(12px,-26px)}}
+@keyframes dot{50%{opacity:1;transform:translateY(-3px)}}
 @media (prefers-reduced-motion:reduce){
-  .bg i,.sleepy .zz,.bubble.pop,#lionWrap.boop,.sync.live::before{animation:none}
-  .wedge{transition:none}
+  .bg i,.sleepy .zz,.bubble.pop,#lionWrap.boop,.sync.live::before,.msg,.typing i{animation:none}
+  .wedge,.bar span,.toast{transition:none}
 }
 </style>
 </head><body>
@@ -133,88 +221,196 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
 
 <main class="app">
   <h1 id="title" aria-label="Stelometer"></h1>
-  <p class="hint" id="hint">Dra i pilen, eller tryck var som helst på mätaren</p>
+  <button type="button" class="gangPill" id="gangPill" aria-label="Byt eller hantera gäng">🦁 <b id="gangPillName">Gänget</b> ▾</button>
 
-  <section class="stage">
-    <div class="gaugeWrap" id="gaugeWrap">
-      <svg id="gauge" viewBox="0 0 400 256" role="slider" tabindex="0" aria-label="Stelhet" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="Mjuk som smör">
-        <g id="wedges"></g>
-        <path d="M38 210A162 162 0 0 1 362 210Z" fill="none" stroke="var(--line)" stroke-width="14" stroke-linejoin="round"/>
-        <g transform="translate(200 210)">
-          <g id="needleRot">
-            <path d="M-6 4L-4 -112L-17 -112L0 -152L17 -112L4 -112L6 4Z" fill="#fff" stroke="#1d1424" stroke-width="6" stroke-linejoin="round"/>
+  <nav class="tabs" role="tablist" aria-label="Vyer">
+    <button type="button" class="tab" role="tab" id="t-meter" aria-controls="p-meter" aria-selected="true">Mätaren</button>
+    <button type="button" class="tab" role="tab" id="t-people" aria-controls="p-people" aria-selected="false">Personer</button>
+    <button type="button" class="tab" role="tab" id="t-chat" aria-controls="p-chat" aria-selected="false">Lejonchatt</button>
+    <button type="button" class="tab" role="tab" id="t-gangs" aria-controls="p-gangs" aria-selected="false">Gäng</button>
+  </nav>
+
+  <!-- Gemensam mätare -->
+  <section class="panel" id="p-meter" role="tabpanel" aria-labelledby="t-meter">
+    <p class="hint" id="hint">Dra i pilen, eller tryck var som helst på mätaren</p>
+    <div class="stage">
+      <div class="gaugeWrap" id="gaugeWrap">
+        <svg id="gauge" viewBox="0 0 400 256" role="slider" tabindex="0" aria-label="Gängets stelhet" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-valuetext="Mjuk som smör">
+          <g id="wedges"></g>
+          <path d="M38 210A162 162 0 0 1 362 210Z" fill="none" stroke="var(--line)" stroke-width="14" stroke-linejoin="round"/>
+          <g transform="translate(200 210)">
+            <g id="needleRot">
+              <path d="M-6 4L-4 -112L-17 -112L0 -152L17 -112L4 -112L6 4Z" fill="#fff" stroke="#1d1424" stroke-width="6" stroke-linejoin="round"/>
+            </g>
+            <circle r="17" fill="#1d1424" stroke="#fff" stroke-width="4"/>
+            <circle r="5" fill="#fff"/>
           </g>
-          <circle r="17" fill="#1d1424" stroke="#fff" stroke-width="4"/>
-          <circle r="5" fill="#fff"/>
-        </g>
-        <text class="gl" x="38" y="246" text-anchor="middle">Låg</text>
-        <text class="gl" x="362" y="246" text-anchor="middle">Hög</text>
-      </svg>
+          <text class="gl" x="38" y="246" text-anchor="middle">Låg</text>
+          <text class="gl" x="362" y="246" text-anchor="middle">Hög</text>
+        </svg>
+      </div>
+
+      <div class="side">
+        <div class="readout">
+          <div class="num" id="num">0</div>
+          <div class="name" id="name">Mjuk som smör</div>
+        </div>
+
+        <div class="lionBox">
+          <div class="bubble" id="bubble" aria-hidden="true">Ahh… jag är en sovande kudde.</div>
+          <div id="lionWrap" role="img" aria-label="Lejonmaskot som reagerar på stelheten. Tryck för att boppa den.">
+            <svg id="lionSvg" viewBox="0 0 220 224" class="sleepy">
+              <g id="lion">
+                <g id="tail"><path d="M158 190C192 192 202 162 194 140" fill="none" style="stroke:var(--fur)" stroke-width="10" stroke-linecap="round"/><ellipse cx="194" cy="134" rx="9" ry="14" class="m1"/></g>
+                <g id="bodyG">
+                  <ellipse cx="110" cy="178" rx="46" ry="36" class="f"/>
+                  <ellipse cx="110" cy="186" rx="26" ry="24" class="mz"/>
+                  <ellipse cx="86" cy="213" rx="16" ry="8" class="f"/>
+                  <ellipse cx="134" cy="213" rx="16" ry="8" class="f"/>
+                  <g id="armL"><ellipse cx="68" cy="180" rx="11" ry="24" class="f2"/><ellipse cx="68" cy="201" rx="10" ry="7" class="f"/></g>
+                  <g id="armR"><ellipse cx="152" cy="180" rx="11" ry="24" class="f2"/><ellipse cx="152" cy="201" rx="10" ry="7" class="f"/></g>
+                </g>
+                <g id="mane"></g>
+                <circle cx="72" cy="62" r="13" class="f"/><circle cx="72" cy="63" r="6" fill="#f08aa0"/>
+                <circle cx="148" cy="62" r="13" class="f"/><circle cx="148" cy="63" r="6" fill="#f08aa0"/>
+                <circle cx="110" cy="100" r="41" class="f"/>
+                <ellipse cx="72" cy="112" rx="10" ry="7" class="f" transform="rotate(-20 72 112)"/>
+                <ellipse cx="148" cy="112" rx="10" ry="7" class="f" transform="rotate(20 148 112)"/>
+                <path d="M102 62Q110 46 118 62Q110 67 102 62Z" class="m2"/>
+                <circle id="blushL" cx="78" cy="109" r="6" fill="#ff7a9a" opacity="0"/>
+                <circle id="blushR" cx="142" cy="109" r="6" fill="#ff7a9a" opacity="0"/>
+                <ellipse cx="110" cy="116" rx="23" ry="16" class="mz"/>
+                <path d="M101 105Q110 100 119 105Q116 114 110 116Q104 114 101 105Z" fill="#c2476a"/>
+                <g fill="#b88a50"><circle cx="97" cy="118" r="1.3"/><circle cx="93" cy="121" r="1.3"/><circle cx="123" cy="118" r="1.3"/><circle cx="127" cy="121" r="1.3"/></g>
+                <path id="mouth" d="" fill="none" stroke="#1d1424" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                <g id="roar" opacity="0">
+                  <ellipse cx="110" cy="126" rx="11" ry="10" fill="#4a1420"/>
+                  <ellipse cx="110" cy="133" rx="6" ry="4" fill="#e0566e"/>
+                  <path d="M101 119l3 7l3-7zM113 119l3 7l3-7z" fill="#fff"/>
+                </g>
+                <clipPath id="clipL"><ellipse cx="92" cy="92" rx="8.5" ry="9.5"/></clipPath>
+                <clipPath id="clipR"><ellipse cx="128" cy="92" rx="8.5" ry="9.5"/></clipPath>
+                <g id="eyeL"><ellipse cx="92" cy="92" rx="8.5" ry="9.5" fill="#fff" stroke="#1d1424" stroke-width="1.6"/>
+                  <circle id="pupL" cx="92" cy="92" r="4.5" fill="#1d1424"/><circle id="shL" cx="90.5" cy="90" r="1.5" fill="#fff"/>
+                  <g clip-path="url(#clipL)"><rect id="lidL" x="80" y="80" width="24" height="0" style="fill:var(--fur)"/><line id="lnL" x1="80" x2="104" y1="80" y2="80" stroke="#1d1424" stroke-width="2"/></g></g>
+                <g id="eyeR"><ellipse cx="128" cy="92" rx="8.5" ry="9.5" fill="#fff" stroke="#1d1424" stroke-width="1.6"/>
+                  <circle id="pupR" cx="128" cy="92" r="4.5" fill="#1d1424"/><circle id="shR" cx="126.5" cy="90" r="1.5" fill="#fff"/>
+                  <g clip-path="url(#clipR)"><rect id="lidR" x="116" y="80" width="24" height="0" style="fill:var(--fur)"/><line id="lnR" x1="116" x2="140" y1="80" y2="80" stroke="#1d1424" stroke-width="2"/></g></g>
+                <line id="browL" x1="80" y1="76" x2="101" y2="75" stroke="#b8531a" stroke-width="4" stroke-linecap="round"/>
+                <line id="browR" x1="119" y1="75" x2="140" y2="76" stroke="#b8531a" stroke-width="4" stroke-linecap="round"/>
+                <path id="sweat" d="M152 62Q159 73 152 80Q145 73 152 62Z" fill="#5ac8fa" stroke="#1d1424" stroke-width="1.4" opacity="0"/>
+                <text class="zz" x="156" y="44">z</text><text class="zz" x="166" y="32">Z</text><text class="zz" x="178" y="18">Z</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button type="button" id="rnd">Slumpa</button>
+          <button type="button" id="mute" aria-pressed="false">Ljud: på</button>
+        </div>
+        <p class="sync" id="sync" role="status">Ansluter till den delade nivån…</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Personer -->
+  <section class="panel" id="p-people" role="tabpanel" aria-labelledby="t-people" hidden>
+    <div class="card" id="nameCard">
+      <h2>Vad heter du?</h2>
+      <p class="muted">Namnet syns för alla i gänget, i topplistan och i notiserna.</p>
+      <form class="row" id="nameForm">
+        <input class="field" id="nameIn" maxlength="20" placeholder="Ditt namn" autocomplete="nickname" required>
+        <button class="pri">Spara</button>
+        <button type="button" id="nameCancel" hidden>Avbryt</button>
+      </form>
     </div>
 
-    <div class="side">
+    <div class="card" id="meCard" hidden>
+      <div class="row between">
+        <div><p class="kicker">Din nivå</p><h2 id="meWho">Du</h2></div>
+        <button type="button" class="small" id="renameMe">Byt namn</button>
+      </div>
+      <input type="range" class="lvl" id="meRange" min="0" max="100" value="50" aria-label="Din egen stelhet">
       <div class="readout">
-        <div class="num" id="num">0</div>
-        <div class="name" id="name">Mjuk som smör</div>
+        <div class="num" id="meNum">50</div>
+        <div class="name" id="meName">Lagom stel</div>
       </div>
+      <p class="muted" id="meNote">Dra reglaget. Alla i gänget ser din nivå direkt.</p>
+    </div>
 
-      <div class="lionBox">
-        <div class="bubble" id="bubble" aria-hidden="true">Ahh… jag är en sovande kudde.</div>
-        <div id="lionWrap" role="img" aria-label="Lejonmaskot som reagerar på stelheten. Tryck för att boppa den.">
-          <svg id="lionSvg" viewBox="0 0 220 224" class="sleepy">
-            <g id="lion">
-              <g id="tail"><path d="M158 190C192 192 202 162 194 140" fill="none" style="stroke:var(--fur)" stroke-width="10" stroke-linecap="round"/><ellipse cx="194" cy="134" rx="9" ry="14" class="m1"/></g>
-              <g id="bodyG">
-                <ellipse cx="110" cy="178" rx="46" ry="36" class="f"/>
-                <ellipse cx="110" cy="186" rx="26" ry="24" class="mz"/>
-                <ellipse cx="86" cy="213" rx="16" ry="8" class="f"/>
-                <ellipse cx="134" cy="213" rx="16" ry="8" class="f"/>
-                <g id="armL"><ellipse cx="68" cy="180" rx="11" ry="24" class="f2"/><ellipse cx="68" cy="201" rx="10" ry="7" class="f"/></g>
-                <g id="armR"><ellipse cx="152" cy="180" rx="11" ry="24" class="f2"/><ellipse cx="152" cy="201" rx="10" ry="7" class="f"/></g>
-              </g>
-              <g id="mane"></g>
-              <circle cx="72" cy="62" r="13" class="f"/><circle cx="72" cy="63" r="6" fill="#f08aa0"/>
-              <circle cx="148" cy="62" r="13" class="f"/><circle cx="148" cy="63" r="6" fill="#f08aa0"/>
-              <circle cx="110" cy="100" r="41" class="f"/>
-              <ellipse cx="72" cy="112" rx="10" ry="7" class="f" transform="rotate(-20 72 112)"/>
-              <ellipse cx="148" cy="112" rx="10" ry="7" class="f" transform="rotate(20 148 112)"/>
-              <path d="M102 62Q110 46 118 62Q110 67 102 62Z" class="m2"/>
-              <circle id="blushL" cx="78" cy="109" r="6" fill="#ff7a9a" opacity="0"/>
-              <circle id="blushR" cx="142" cy="109" r="6" fill="#ff7a9a" opacity="0"/>
-              <ellipse cx="110" cy="116" rx="23" ry="16" class="mz"/>
-              <path d="M101 105Q110 100 119 105Q116 114 110 116Q104 114 101 105Z" fill="#c2476a"/>
-              <g fill="#b88a50"><circle cx="97" cy="118" r="1.3"/><circle cx="93" cy="121" r="1.3"/><circle cx="123" cy="118" r="1.3"/><circle cx="127" cy="121" r="1.3"/></g>
-              <path id="mouth" d="" fill="none" stroke="#1d1424" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
-              <g id="roar" opacity="0">
-                <ellipse cx="110" cy="126" rx="11" ry="10" fill="#4a1420"/>
-                <ellipse cx="110" cy="133" rx="6" ry="4" fill="#e0566e"/>
-                <path d="M101 119l3 7l3-7zM113 119l3 7l3-7z" fill="#fff"/>
-              </g>
-              <clipPath id="clipL"><ellipse cx="92" cy="92" rx="8.5" ry="9.5"/></clipPath>
-              <clipPath id="clipR"><ellipse cx="128" cy="92" rx="8.5" ry="9.5"/></clipPath>
-              <g id="eyeL"><ellipse cx="92" cy="92" rx="8.5" ry="9.5" fill="#fff" stroke="#1d1424" stroke-width="1.6"/>
-                <circle id="pupL" cx="92" cy="92" r="4.5" fill="#1d1424"/><circle id="shL" cx="90.5" cy="90" r="1.5" fill="#fff"/>
-                <g clip-path="url(#clipL)"><rect id="lidL" x="80" y="80" width="24" height="0" style="fill:var(--fur)"/><line id="lnL" x1="80" x2="104" y1="80" y2="80" stroke="#1d1424" stroke-width="2"/></g></g>
-              <g id="eyeR"><ellipse cx="128" cy="92" rx="8.5" ry="9.5" fill="#fff" stroke="#1d1424" stroke-width="1.6"/>
-                <circle id="pupR" cx="128" cy="92" r="4.5" fill="#1d1424"/><circle id="shR" cx="126.5" cy="90" r="1.5" fill="#fff"/>
-                <g clip-path="url(#clipR)"><rect id="lidR" x="116" y="80" width="24" height="0" style="fill:var(--fur)"/><line id="lnR" x1="116" x2="140" y1="80" y2="80" stroke="#1d1424" stroke-width="2"/></g></g>
-              <line id="browL" x1="80" y1="76" x2="101" y2="75" stroke="#b8531a" stroke-width="4" stroke-linecap="round"/>
-              <line id="browR" x1="119" y1="75" x2="140" y2="76" stroke="#b8531a" stroke-width="4" stroke-linecap="round"/>
-              <path id="sweat" d="M152 62Q159 73 152 80Q145 73 152 62Z" fill="#5ac8fa" stroke="#1d1424" stroke-width="1.4" opacity="0"/>
-              <text class="zz" x="156" y="44">z</text><text class="zz" x="166" y="32">Z</text><text class="zz" x="178" y="18">Z</text>
-            </g>
-          </svg>
-        </div>
-      </div>
+    <div class="card">
+      <h2>Topplista just nu</h2>
+      <p class="muted" id="lbSub">Från stelast till mjukast.</p>
+      <ol class="lb" id="lb"></ol>
+    </div>
+  </section>
 
-      <div class="controls">
-        <button type="button" id="rnd">Slumpa</button>
-        <button type="button" id="mute" aria-pressed="false">Ljud: på</button>
+  <!-- Lejonchatt -->
+  <section class="panel" id="p-chat" role="tabpanel" aria-labelledby="t-chat" hidden>
+    <div class="card chatCard">
+      <div class="chatHead">
+        <div class="ava" aria-hidden="true">🦁</div>
+        <div><h2 style="margin:0">Lejonet</h2><p class="muted" style="margin:0" id="chatMood">Mjuk som smör</p></div>
       </div>
-      <p class="sync" id="sync" role="status">Ansluter till den delade nivån…</p>
+      <div class="chatLog" id="chatLog" aria-live="polite"></div>
+      <div class="chips" id="chips"></div>
+      <form class="row" id="chatForm" style="margin-top:0">
+        <input class="field" id="chatIn" maxlength="200" placeholder="Fråga lejonet något…" autocomplete="off">
+        <button class="pri">Skicka</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Gäng -->
+  <section class="panel" id="p-gangs" role="tabpanel" aria-labelledby="t-gangs" hidden>
+    <div class="card">
+      <p class="kicker">Du är i</p>
+      <h2 id="gName">Gänget</h2>
+      <p class="muted" id="gCount"></p>
+      <div class="row">
+        <button type="button" class="pri" id="copyLink">Kopiera länk</button>
+        <button type="button" id="shareLink" hidden>Dela</button>
+        <button type="button" id="renameGang">Byt namn</button>
+      </div>
+      <form class="row" id="renameForm" hidden>
+        <input class="field" id="renameIn" maxlength="30" required aria-label="Nytt namn på gänget">
+        <button class="pri">Spara</button>
+        <button type="button" id="renameCancel">Avbryt</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Skapa nytt gäng</h2>
+      <form class="row" id="createForm">
+        <input class="field" id="createIn" maxlength="30" placeholder="T.ex. Fikagänget" required aria-label="Namn på nytt gäng">
+        <button class="pri">Skapa</button>
+      </form>
+      <p class="muted">Du hamnar direkt i det nya gänget. Skicka sedan länken till dem som ska vara med.</p>
+    </div>
+
+    <div class="card">
+      <h2>Dina gäng</h2>
+      <ul class="glist" id="glist"></ul>
+    </div>
+
+    <div class="card">
+      <h2>Gå med i ett gäng</h2>
+      <form class="row" id="joinForm">
+        <input class="field" id="joinIn" placeholder="Klistra in länken du fått" required aria-label="Länk till gäng">
+        <button class="pri">Gå med</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Notiser</h2>
+      <p class="muted" id="notifTxt"></p>
+      <div class="row"><button type="button" id="notifBtn">Slå på notiser</button></div>
     </div>
   </section>
 </main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 (function(){
@@ -222,16 +418,24 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
   function $(id){return document.getElementById(id)}
   function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
   function lerp(a,b,t){return a+(b-a)*t}
+  function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+  function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  function rid(n){var s='';while(s.length<n)s+=Math.random().toString(36).slice(2);return s.slice(0,n)}
   var rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   var NAMES=['Mjuk som smör','Len som sammet','Lite fjädrande','Lagom stel','Ganska stel','Stel som en planka','Stenhård','Hårdare än diamant'];
   var QUIPS=['Ahh… jag är en sovande kudde.','Mmm, perfekt för en lejon-tupplur.','Lite spänd, men det går att böja på.','Helt okej! Varken fisk eller fågel.','Oj, nu börjar det kännas i nacken.','Jag kan inte vända på huvudet!','Hjälp, jag har blivit en staty!','RAAAWR! Total stelkramp!'];
+  /* Ord för notiser, gemensam mätare ("X tycker att det är …") och egen mätare ("X känner sig …") */
+  var SHARED_PH=['mjukt som smör','len som sammet','rätt så mjukt','lagom stelt','ganska stelt','stelt som en planka','superstelt','stelare än en diamant'];
+  var PERS_PH=['mjuk som smör','len som sammet','rätt så mjuk','lagom stel','ganska stel','stel som en planka','superstel','hårdare än diamant'];
   var ZH=[215,172,125,48,28,6,335];
   var BH=[215,172,125,48,28,6,-25];
   var ZW=100/7;
   var NOTES=[262,330,392,440,523,659,784];
 
   function bgHue(c){var f=clamp(c/ZW-.5,0,6);var i=Math.min(5,Math.floor(f));return lerp(BH[i],BH[i+1],f-i)}
+  function labelOf(v){var z=Math.min(6,Math.floor(clamp(v,0,100)/ZW));return (z===6&&v>=98)?7:z}
+  function hueOf(v){return ZH[Math.min(6,Math.floor(clamp(v,0,100)/ZW))]}
 
   var titleEl=$('title'),letters=[];
   'Stelometer'.split('').forEach(function(ch){var s=document.createElement('span');s.textContent=ch;titleEl.appendChild(s);letters.push(s)});
@@ -276,9 +480,9 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
 
   var pos=0,vel=0,target=0,dragging=false,last=performance.now(),t=0;
   var zone=-1,label=-1,maxed=false,mined=false,lastTick=-1,lastNum=-1,lastHue=-1,nextBlink=2,sleepyOn=true;
-  var muted=false;
-  try{muted=localStorage.getItem('stelo-mute')==='1'}catch(e){}
+  var muted=lsGet('stelo-mute')==='1';
 
+  /* ---------- Ljud ---------- */
   var ac=null;
   function unlock(){
     if(!ac){try{var AC=window.AudioContext||window.webkitAudioContext;if(AC)ac=new AC()}catch(e){}}
@@ -308,6 +512,7 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
     o.start(n);lf.start(n);o.stop(n+.9);lf.stop(n+.9);
   }
 
+  /* ---------- Partiklar ---------- */
   var fx=$('fx'),cx=fx.getContext('2d'),W=0,H=0,parts=[],needsClear=false;
   function resize(){
     var d=Math.min(2,window.devicePixelRatio||1);
@@ -321,16 +526,14 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
     return {x:r.left+200*s,y:r.top+210*s,s:s};
   }
   function burst(){
-    if(rm)return;
-    var h=hub();
+    var h=hub();if(rm||!h.s)return;
     for(var i=0;i<80;i++){
       var a=(-Math.PI)*(.1+Math.random()*.8),sp=380+Math.random()*620;
       parts.push({k:'c',x:h.x,y:h.y-60*h.s,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,r:Math.random()*6,vr:(Math.random()-.5)*14,s:6+Math.random()*7,col:'hsl('+ZH[Math.floor(Math.random()*7)]+' 90% 58%)',life:2.4});
     }
   }
   function bubbles(){
-    if(rm)return;
-    var h=hub();
+    var h=hub();if(rm||!h.s)return;
     for(var i=0;i<22;i++){
       parts.push({k:'b',x:h.x+(Math.random()-.5)*h.s*320,y:h.y+10,vx:(Math.random()-.5)*30,vy:-60-Math.random()*90,s:5+Math.random()*10,life:2.2+Math.random()});
     }
@@ -360,6 +563,7 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
     }
   }
 
+  /* ---------- Gemensam mätare, styrning ---------- */
   function setFrom(e){
     var r=svg.getBoundingClientRect(),s=r.width/400;
     var dx=e.clientX-(r.left+200*s),dy=(r.top+210*s)-e.clientY;
@@ -393,7 +597,7 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
   paintMute();
   muteBtn.addEventListener('click',function(){
     unlock();muted=!muted;paintMute();
-    try{localStorage.setItem('stelo-mute',muted?'1':'0')}catch(e){}
+    lsSet('stelo-mute',muted?'1':'0');
     if(!muted)blip(660,.12,'triangle',.08);
   });
   lionWrap.addEventListener('click',function(){
@@ -415,12 +619,13 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
       if(i===z){w.classList.add('on');w.style.transform=w.dataset.t}
       else{w.classList.remove('on');w.style.transform=''}
     });
-    if(prev>=0)blip(NOTES[z],.14,'triangle',.1);
+    if(prev>=0&&curTab==='meter')blip(NOTES[z],.14,'triangle',.1);
   }
   function setLabel(l){
     label=l;
     nameEl.textContent=NAMES[l];
     bubble.textContent=QUIPS[l];
+    chatMood.textContent=NAMES[l];
     svg.setAttribute('aria-valuetext',NAMES[l]);
     bubble.classList.remove('pop');void bubble.offsetWidth;bubble.classList.add('pop');
   }
@@ -444,21 +649,21 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
     if(rn!==lastNum){lastNum=rn;numEl.textContent=rn;svg.setAttribute('aria-valuenow',rn)}
     var step=Math.floor(cl/5);
     if(step!==lastTick){
-      if(lastTick>=0&&(dragging||Math.abs(vel)>8))blip(500+cl*7,.035,'square',.018);
+      if(lastTick>=0&&(dragging||Math.abs(vel)>8)&&curTab==='meter')blip(500+cl*7,.035,'square',.018);
       lastTick=step;
     }
 
     var hu=bgHue(cl);
     if(Math.abs(hu-lastHue)>.15){lastHue=hu;document.documentElement.style.setProperty('--h',hu.toFixed(1))}
 
-    if(cl>=97&&!maxed){maxed=true;burst();fanfare();setTimeout(roarSnd,150)}
+    if(cl>=97&&!maxed){maxed=true;if(curTab==='meter'){burst();fanfare();setTimeout(roarSnd,150)}}
     else if(cl<90&&maxed)maxed=false;
-    if(cl<=3&&!mined){mined=true;bubbles();blip(330,.6,'sine',.07,.55)}
+    if(cl<=3&&!mined){mined=true;if(curTab==='meter'){bubbles();blip(330,.6,'sine',.07,.55)}}
     else if(cl>10&&mined)mined=false;
 
-    if((dragging||Math.abs(vel)>30)&&!rm){
+    if((dragging||Math.abs(vel)>30)&&!rm&&curTab==='meter'){
       var h=hub(),rot=(clamp(pos,-4,104)-50)*Math.PI/180*1.8;
-      sparkle(h.x+Math.sin(rot)*150*h.s,h.y-Math.cos(rot)*150*h.s);
+      if(h.s)sparkle(h.x+Math.sin(rot)*150*h.s,h.y-Math.cos(rot)*150*h.s);
     }
     stepParts(dt);
 
@@ -470,101 +675,657 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
       letters[i].style.transform='translateY('+y.toFixed(2)+'px) rotate('+r.toFixed(2)+'deg)';
     }
 
-    var jx=shake*(Math.random()-.5)*5,jy=shake*(Math.random()-.5)*4;
-    var br=rm?1:1+Math.sin(t*2)*.012;
-    lion.setAttribute('transform','translate('+jx.toFixed(2)+' '+jy.toFixed(2)+') translate(110 214) scale(1 '+br.toFixed(4)+') translate(-110 -214)');
+    if(curTab==='meter'){
+      var jx=shake*(Math.random()-.5)*5,jy=shake*(Math.random()-.5)*4;
+      var br=rm?1:1+Math.sin(t*2)*.012;
+      lion.setAttribute('transform','translate('+jx.toFixed(2)+' '+jy.toFixed(2)+') translate(110 214) scale(1 '+br.toFixed(4)+') translate(-110 -214)');
 
-    var ms=1+a*.08+(cl>=97&&!rm?Math.sin(t*30)*.015:0);
-    maneG.setAttribute('transform','translate(110 100) scale('+ms.toFixed(3)+') translate(-110 -100)');
+      var ms=1+a*.08+(cl>=97&&!rm?Math.sin(t*30)*.015:0);
+      maneG.setAttribute('transform','translate(110 100) scale('+ms.toFixed(3)+') translate(-110 -100)');
 
-    var stiff=clamp((cl-55)/25,0,1);
-    var wag=Math.sin(t*(cl<50?2.2:5.5))*(cl<50?10:22)*(1-stiff);
-    tail.setAttribute('transform','rotate('+wag.toFixed(2)+' 158 190)');
+      var stiff=clamp((cl-55)/25,0,1);
+      var wag=Math.sin(t*(cl<50?2.2:5.5))*(cl<50?10:22)*(1-stiff);
+      tail.setAttribute('transform','rotate('+wag.toFixed(2)+' 158 190)');
 
-    var flex=clamp((cl-62)/36,0,1)*118;
-    armL.setAttribute('transform','rotate('+(flex+4).toFixed(1)+' 70 158)');
-    armR.setAttribute('transform','rotate('+(-flex-4).toFixed(1)+' 150 158)');
+      var flex=clamp((cl-62)/36,0,1)*118;
+      armL.setAttribute('transform','rotate('+(flex+4).toFixed(1)+' 70 158)');
+      armR.setAttribute('transform','rotate('+(-flex-4).toFixed(1)+' 150 158)');
 
-    var clos=clamp(1-(cl-8)/30,0,.92);
-    if(t>nextBlink){
-      if(t<nextBlink+.14)clos=1;else nextBlink=t+2+Math.random()*3.5;
+      var clos=clamp(1-(cl-8)/30,0,.92);
+      if(t>nextBlink){
+        if(t<nextBlink+.14)clos=1;else nextBlink=t+2+Math.random()*3.5;
+      }
+      var lh=clos*20;
+      lidL.setAttribute('height',lh.toFixed(1));lidR.setAttribute('height',lh.toFixed(1));
+      lnL.setAttribute('y1',(80+lh).toFixed(1));lnL.setAttribute('y2',(80+lh).toFixed(1));
+      lnR.setAttribute('y1',(80+lh).toFixed(1));lnR.setAttribute('y2',(80+lh).toFixed(1));
+      lnL.style.opacity=lnR.style.opacity=lh>.5?1:0;
+
+      var wide=1+clamp((cl-60)/40,0,1)*.18;
+      eyeL.setAttribute('transform','translate(92 92) scale('+wide.toFixed(3)+') translate(-92 -92)');
+      eyeR.setAttribute('transform','translate(128 92) scale('+wide.toFixed(3)+') translate(-128 -92)');
+      var pr=4.5-clamp((cl-70)/30,0,1)*1.7;
+      var lx=(cl-50)/50*3,ly=-1.2;
+      pupL.setAttribute('r',pr.toFixed(2));pupR.setAttribute('r',pr.toFixed(2));
+      pupL.setAttribute('cx',(92+lx).toFixed(2));pupL.setAttribute('cy',(92+ly).toFixed(2));
+      pupR.setAttribute('cx',(128+lx).toFixed(2));pupR.setAttribute('cy',(92+ly).toFixed(2));
+      shL.setAttribute('cx',(90.5+lx).toFixed(2));shL.setAttribute('cy',(90+ly).toFixed(2));
+      shR.setAttribute('cx',(126.5+lx).toFixed(2));shR.setAttribute('cy',(90+ly).toFixed(2));
+
+      var inY=75+Math.pow(a,1.5)*7,outY=76-a*5.5;
+      browL.setAttribute('y1',outY.toFixed(1));browL.setAttribute('y2',inY.toFixed(1));
+      browR.setAttribute('y1',inY.toFixed(1));browR.setAttribute('y2',outY.toFixed(1));
+
+      var s=clamp(1-cl/50,-1,1),y0=121-3*s,y1=122+6*s;
+      mouth.setAttribute('d','M97 '+y0.toFixed(1)+'Q103.5 '+y1.toFixed(1)+' 110 119Q116.5 '+y1.toFixed(1)+' 123 '+y0.toFixed(1)+'M110 115L110 119');
+      var ro=clamp((cl-90)/8,0,1);
+      roar.setAttribute('opacity',ro>.05?1:0);
+      roar.setAttribute('transform','translate(110 118) scale(1 '+Math.max(ro,.01).toFixed(3)+') translate(-110 -118)');
+      mouth.style.opacity=ro>.3?0:1;
+
+      var bl=clamp(1-cl/45,0,1)*.55;
+      blushL.setAttribute('opacity',bl.toFixed(2));blushR.setAttribute('opacity',bl.toFixed(2));
+
+      var sw=clamp((cl-62)/20,0,1),so=(t*26)%20;
+      sweat.setAttribute('opacity',(sw*(1-so/26)).toFixed(2));
+      sweat.setAttribute('transform','translate(0 '+so.toFixed(1)+')');
+
+      var sl=cl<14;
+      if(sl!==sleepyOn){sleepyOn=sl;lionSvg.setAttribute('class',sl?'sleepy':'')}
     }
-    var lh=clos*20;
-    lidL.setAttribute('height',lh.toFixed(1));lidR.setAttribute('height',lh.toFixed(1));
-    lnL.setAttribute('y1',(80+lh).toFixed(1));lnL.setAttribute('y2',(80+lh).toFixed(1));
-    lnR.setAttribute('y1',(80+lh).toFixed(1));lnR.setAttribute('y2',(80+lh).toFixed(1));
-    lnL.style.opacity=lnR.style.opacity=lh>.5?1:0;
-
-    var wide=1+clamp((cl-60)/40,0,1)*.18;
-    eyeL.setAttribute('transform','translate(92 92) scale('+wide.toFixed(3)+') translate(-92 -92)');
-    eyeR.setAttribute('transform','translate(128 92) scale('+wide.toFixed(3)+') translate(-128 -92)');
-    var pr=4.5-clamp((cl-70)/30,0,1)*1.7;
-    var lx=(cl-50)/50*3,ly=-1.2;
-    pupL.setAttribute('r',pr.toFixed(2));pupR.setAttribute('r',pr.toFixed(2));
-    pupL.setAttribute('cx',(92+lx).toFixed(2));pupL.setAttribute('cy',(92+ly).toFixed(2));
-    pupR.setAttribute('cx',(128+lx).toFixed(2));pupR.setAttribute('cy',(92+ly).toFixed(2));
-    shL.setAttribute('cx',(90.5+lx).toFixed(2));shL.setAttribute('cy',(90+ly).toFixed(2));
-    shR.setAttribute('cx',(126.5+lx).toFixed(2));shR.setAttribute('cy',(90+ly).toFixed(2));
-
-    var inY=75+Math.pow(a,1.5)*7,outY=76-a*5.5;
-    browL.setAttribute('y1',outY.toFixed(1));browL.setAttribute('y2',inY.toFixed(1));
-    browR.setAttribute('y1',inY.toFixed(1));browR.setAttribute('y2',outY.toFixed(1));
-
-    var s=clamp(1-cl/50,-1,1),y0=121-3*s,y1=122+6*s;
-    mouth.setAttribute('d','M97 '+y0.toFixed(1)+'Q103.5 '+y1.toFixed(1)+' 110 119Q116.5 '+y1.toFixed(1)+' 123 '+y0.toFixed(1)+'M110 115L110 119');
-    var ro=clamp((cl-90)/8,0,1);
-    roar.setAttribute('opacity',ro>.05?1:0);
-    roar.setAttribute('transform','translate(110 118) scale(1 '+Math.max(ro,.01).toFixed(3)+') translate(-110 -118)');
-    mouth.style.opacity=ro>.3?0:1;
-
-    var bl=clamp(1-cl/45,0,1)*.55;
-    blushL.setAttribute('opacity',bl.toFixed(2));blushR.setAttribute('opacity',bl.toFixed(2));
-
-    var sw=clamp((cl-62)/20,0,1),so=(t*26)%20;
-    sweat.setAttribute('opacity',(sw*(1-so/26)).toFixed(2));
-    sweat.setAttribute('transform','translate(0 '+so.toFixed(1)+')');
-
-    var sl=cl<14;
-    if(sl!==sleepyOn){sleepyOn=sl;lionSvg.setAttribute('class',sl?'sleepy':'')}
 
     requestAnimationFrame(frame);
   }
 
-  var sid=Math.random().toString(36).slice(2,10),syncEl=$('sync'),gotRemote=false,sendT=0,pendTimer=null,lastSent=-1;
-  function setSync(txt,live){syncEl.textContent=txt;syncEl.className=live?'sync live':'sync'}
+  /* ---------- Flikar ---------- */
+  var TABS=['meter','people','chat','gangs'],curTab='meter';
+  var chatMood=$('chatMood');
+  function showTab(name,focus){
+    curTab=name;
+    TABS.forEach(function(n){
+      var on=n===name;
+      $('t-'+n).setAttribute('aria-selected',on?'true':'false');
+      $('t-'+n).tabIndex=on?0:-1;
+      $('p-'+n).hidden=!on;
+    });
+    if(focus)$('t-'+name).focus();
+    if(name==='people')renderPeople();
+    if(name==='gangs')renderGangs();
+    if(name==='chat'){startChat();if(window.innerWidth>700)$('chatIn').focus()}
+  }
+  TABS.forEach(function(n,i){
+    var b=$('t-'+n);
+    b.addEventListener('click',function(){unlock();showTab(n)});
+    b.addEventListener('keydown',function(e){
+      var d=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:0;
+      if(d){e.preventDefault();showTab(TABS[(i+d+TABS.length)%TABS.length],true)}
+    });
+  });
+  $('gangPill').addEventListener('click',function(){showTab('gangs')});
+
+  /* ---------- Toast ---------- */
+  var toastEl=$('toast'),toastT=null;
+  function toast(msg){
+    toastEl.textContent=msg;toastEl.classList.add('show');
+    clearTimeout(toastT);toastT=setTimeout(function(){toastEl.classList.remove('show')},3200);
+  }
+
+  /* ---------- Identitet ---------- */
+  var sid=rid(8);
+  var myId=lsGet('stelo-pid');if(!myId){myId=rid(10);lsSet('stelo-pid',myId)}
+  var myName=(lsGet('stelo-name')||'').slice(0,20);
+
+  /* ---------- Gäng ---------- */
   function h32(s){var h=5381;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)}
-  var room=(location.hash||'').replace(/[^-_A-Za-z0-9]/g,'').slice(0,64);
-  if(!room)room='stelo-'+h32(location.origin+location.pathname);
-  var base='https://ntfy.sh/'+room;
-  function flush(){
+  var LEGACY='stelo-'+h32(location.origin+location.pathname);
+  function cleanId(s){return (s||'').replace(/[^-_A-Za-z0-9]/g,'').slice(0,64)}
+  function cleanName(s){return (s||'').replace(/\s+/g,' ').trim().slice(0,30)}
+  function parseRef(str){
+    var h=str||'',i=h.indexOf('#');if(i>=0)h=h.slice(i+1);
+    var j=h.indexOf('/'),id=cleanId(j<0?h:h.slice(0,j)),nm='';
+    if(j>=0){try{nm=decodeURIComponent(h.slice(j+1))}catch(e){nm=h.slice(j+1)}}
+    return {id:id,name:cleanName(nm)};
+  }
+  function loadGangs(){try{var g=JSON.parse(lsGet('stelo-gangs')||'[]');return Array.isArray(g)?g.filter(function(x){return x&&cleanId(x.id)}):[]}catch(e){return []}}
+  function saveGangs(){lsSet('stelo-gangs',JSON.stringify(gangs.slice(0,30)))}
+  var gangs=loadGangs();
+  function findGang(id){for(var i=0;i<gangs.length;i++)if(gangs[i].id===id)return gangs[i];return null}
+  function rememberGang(id,name){
+    var g=findGang(id);
+    if(g){if(name)g.name=name;g.ts=Date.now()}
+    else{gangs.unshift({id:id,name:name||'Namnlöst gäng',ts:Date.now()})}
+    gangs.sort(function(a,b){return b.ts-a.ts});saveGangs();
+  }
+  function gangLink(){return location.origin+location.pathname+'#'+room+'/'+encodeURIComponent(gangName)}
+  function setHash(){try{history.replaceState(null,'','#'+room+'/'+encodeURIComponent(gangName))}catch(e){}}
+
+  /* ---------- Delning via ntfy ---------- */
+  var room='',gangName='',base='',es=null,gen=0,seen={},replay=false,gotShared=false;
+  var people={},lastSharedLab=-1,myLevel=null;
+  var syncEl=$('sync');
+  function setSync(txt,live){syncEl.textContent=txt;syncEl.className=live?'sync live':'sync'}
+
+  var sh={last:-1,lastFinal:false,t:0,timer:null},ps={last:-1,lastFinal:false,t:0,timer:null};
+  function post(body,st,retry){
+    fetch(base,{method:'POST',body:JSON.stringify(body)}).then(function(r){
+      if(r.status===429){st.last=-1;setTimeout(retry,5000)}
+    },function(){st.last=-1;setSync('Kunde inte skicka. Bara du ser ändringen just nu.')});
+  }
+  function flushShared(final){
     var v=Math.round(target);
-    if(v===lastSent)return;
-    lastSent=v;sendT=Date.now();
-    fetch(base,{method:'POST',body:JSON.stringify({l:v,s:sid})}).then(function(r){
-      if(r.status===429){lastSent=-1;setTimeout(flush,5000)}
-    },function(){lastSent=-1;setSync('Kunde inte skicka. Bara du ser ändringen just nu.')});
+    if(v===sh.last&&(!final||sh.lastFinal))return;
+    sh.last=v;sh.lastFinal=!!final;sh.t=Date.now();
+    if(final)lastSharedLab=labelOf(v);
+    post({t:'g',l:v,s:sid,n:myName||undefined,r:final?1:0},sh,function(){flushShared(final)});
   }
   function push(now){
-    if(now){clearTimeout(pendTimer);pendTimer=null;flush();return}
-    if(pendTimer)return;
-    pendTimer=setTimeout(function(){pendTimer=null;flush()},Math.max(150,1500-(Date.now()-sendT)));
+    if(now){clearTimeout(sh.timer);sh.timer=null;flushShared(true);return}
+    if(sh.timer)return;
+    sh.timer=setTimeout(function(){sh.timer=null;flushShared(false)},Math.max(150,1500-(Date.now()-sh.t)));
   }
-  function onMsg(e){
-    var m,d;
-    try{m=JSON.parse(e.data);d=JSON.parse(m.message)}catch(x){return}
-    if(!d||typeof d.l!=='number'||d.s===sid)return;
-    gotRemote=true;
-    if(!dragging){target=clamp(d.l,0,100);hint.classList.add('gone')}
+  function flushPersonal(final){
+    if(myLevel===null||!myName)return;
+    var v=Math.round(myLevel);
+    if(v===ps.last&&(!final||ps.lastFinal))return;
+    ps.last=v;ps.lastFinal=!!final;ps.t=Date.now();
+    post({t:'p',id:myId,n:myName,pl:v,s:sid,r:final?1:0},ps,function(){flushPersonal(final)});
   }
-  setTimeout(function(){if(!gotRemote)target=55},450);
-  if(!window.EventSource){setSync('Din webbläsare saknar stöd för delning. Bara du ser ändringar.')}
+  function pushPersonal(now){
+    if(now){clearTimeout(ps.timer);ps.timer=null;flushPersonal(true);return}
+    if(ps.timer)return;
+    ps.timer=setTimeout(function(){ps.timer=null;flushPersonal(false)},Math.max(150,1500-(Date.now()-ps.t)));
+  }
+  function sendMeta(){post({t:'m',name:gangName,s:sid},{last:-1},function(){})}
+
+  function handle(m){
+    if(!m||m.event!=='message'||!m.id||seen[m.id])return;
+    seen[m.id]=1;
+    var d;try{d=JSON.parse(m.message)}catch(x){return}
+    if(!d||typeof d!=='object')return;
+    var when=(m.time||Date.now()/1000)*1000;
+
+    if(d.t==='m'){
+      var nm=cleanName(d.name);
+      if(nm){gangName=nm;rememberGang(room,nm);setHash();paintGang()}
+      return;
+    }
+    if(typeof d.pl==='number'&&d.id){
+      var id=cleanId(d.id),n=String(d.n||'Någon').slice(0,20),v=clamp(d.pl,0,100);
+      if(!id)return;
+      var prev=people[id];
+      people[id]={n:n,l:v,ts:when};
+      if(id===myId&&d.s!==sid&&!replay){myLevel=v;paintMe()}
+      if(id===myId&&replay){myLevel=v}
+      if(!replay&&d.s!==sid&&d.r&&(!prev||labelOf(prev.l)!==labelOf(v))){
+        notify(n+' känner sig '+PERS_PH[labelOf(v)]);
+      }
+      if(!replay)renderPeople();
+      return;
+    }
+    if(typeof d.l==='number'){
+      if(d.s===sid)return;
+      gotShared=true;
+      var lv=clamp(d.l,0,100);
+      if(!dragging){target=lv;hint.classList.add('gone')}
+      if(replay){lastSharedLab=labelOf(lv);return}
+      if(d.r){
+        var lab=labelOf(lv);
+        if(lab!==lastSharedLab)notify((d.n?String(d.n).slice(0,20):'Någon')+' tycker att det är '+SHARED_PH[lab]);
+        lastSharedLab=lab;
+      }
+    }
+  }
+
+  function openStream(since,g){
+    if(g!==gen)return;
+    if(!window.EventSource){setSync('Din webbläsare saknar stöd för delning. Bara du ser ändringar.');return}
+    es=new EventSource(base+'/sse?since='+encodeURIComponent(since));
+    es.addEventListener('open',function(){if(g===gen)setSync('Live: alla i '+gangName+' ser samma nivå',true)});
+    es.addEventListener('message',function(e){if(g!==gen)return;try{handle(JSON.parse(e.data))}catch(x){}});
+    es.onerror=function(){if(g===gen)setSync('Tappade anslutningen. Försöker igen…')};
+  }
+
+  function connect(id,name){
+    gen++;var g=gen;
+    if(es){try{es.close()}catch(e){}es=null}
+    clearTimeout(sh.timer);clearTimeout(ps.timer);sh.timer=ps.timer=null;
+    sh.last=ps.last=-1;
+    room=id;base='https://ntfy.sh/'+room;
+    var known=findGang(id);
+    gangName=name||(known&&known.name)||(id===LEGACY?'Startgänget':'Namnlöst gäng');
+    rememberGang(room,gangName);lsSet('stelo-last',room);setHash();
+    seen={};people={};gotShared=false;lastSharedLab=-1;myLevel=null;
+    paintGang();renderPeople();paintMe();
+    setSync('Ansluter till '+gangName+'…');
+    var start=Math.floor(Date.now()/1000);
+    fetch(base+'/json?poll=1&since=12h').then(function(r){return r.text()}).then(function(txt){
+      if(g!==gen)return;
+      var lastId='';
+      replay=true;
+      txt.split('\n').forEach(function(line){
+        if(!line)return;
+        try{var m=JSON.parse(line);handle(m);if(m.event==='message'&&m.id)lastId=m.id}catch(x){}
+      });
+      replay=false;
+      if(!gotShared&&!dragging)target=55;
+      paintGang();renderPeople();paintMe();
+      openStream(lastId||String(start),g);
+    }).catch(function(){
+      if(g!==gen)return;
+      replay=false;
+      if(!gotShared&&!dragging)target=55;
+      openStream(String(start),g);
+    });
+  }
+
+  function switchGang(id,name){
+    if(!id)return;
+    if(id===room){showTab('meter');return}
+    connect(id,name);
+    toast('Du är nu i '+gangName);
+  }
+  window.addEventListener('hashchange',function(){
+    var r=parseRef(location.hash);
+    if(r.id&&r.id!==room)connect(r.id,r.name);
+  });
+
+  /* ---------- Gäng-UI ---------- */
+  function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e}
+  function activeCount(){var n=0;for(var k in people)n++;return n}
+  function paintGang(){
+    $('gangPillName').textContent=gangName;
+    $('gName').textContent=gangName;
+    document.title='Stelometer · '+gangName;
+    var n=activeCount();
+    $('gCount').textContent=n?(n===1?'1 person har satt sin nivå senaste halvdygnet.':n+' personer har satt sin nivå senaste halvdygnet.'):'Ingen har satt en egen nivå här än.';
+    if(curTab==='gangs')renderGangs();
+  }
+  function renderGangs(){
+    var ul=$('glist');ul.textContent='';
+    gangs.forEach(function(g){
+      var li=el('li','gitem'+(g.id===room?' cur':''));
+      li.appendChild(el('span','gn',g.name));
+      if(g.id===room){li.appendChild(el('span','tag','Aktivt'))}
+      else{
+        var open=el('button','small','Öppna');open.type='button';
+        open.addEventListener('click',function(){switchGang(g.id,g.name);showTab('meter')});
+        var del=el('button','small','✕');del.type='button';del.setAttribute('aria-label','Ta bort '+g.name+' från listan');
+        del.addEventListener('click',function(){gangs=gangs.filter(function(x){return x.id!==g.id});saveGangs();renderGangs();toast(g.name+' är borttaget från din lista')});
+        li.appendChild(open);li.appendChild(del);
+      }
+      ul.appendChild(li);
+    });
+  }
+  function copyText(txt){
+    if(navigator.clipboard&&window.isSecureContext){
+      return navigator.clipboard.writeText(txt).then(function(){return true},function(){return fallbackCopy(txt)});
+    }
+    return Promise.resolve(fallbackCopy(txt));
+  }
+  function fallbackCopy(txt){
+    var ta=el('textarea');ta.value=txt;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+    var ok=false;try{ok=document.execCommand('copy')}catch(e){}
+    document.body.removeChild(ta);return ok;
+  }
+  $('copyLink').addEventListener('click',function(){
+    copyText(gangLink()).then(function(ok){toast(ok?'Länken är kopierad. Skicka den till gänget!':'Kunde inte kopiera. Länken är '+gangLink())});
+  });
+  var shareBtn=$('shareLink');
+  if(navigator.share){shareBtn.hidden=false;shareBtn.addEventListener('click',function(){
+    navigator.share({title:'Stelometer · '+gangName,text:'Häng med i '+gangName+' på Stelometern!',url:gangLink()}).catch(function(){});
+  })}
+  $('renameGang').addEventListener('click',function(){
+    $('renameForm').hidden=false;$('renameIn').value=gangName;$('renameIn').focus();$('renameIn').select();
+  });
+  $('renameCancel').addEventListener('click',function(){$('renameForm').hidden=true});
+  $('renameForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var nm=cleanName($('renameIn').value);if(!nm)return;
+    gangName=nm;rememberGang(room,nm);setHash();paintGang();sendMeta();
+    $('renameForm').hidden=true;toast('Gänget heter nu '+nm);
+  });
+  $('createForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var nm=cleanName($('createIn').value);if(!nm)return;
+    connect('g-'+rid(12),nm);sendMeta();
+    $('createIn').value='';
+    toast(nm+' är skapat. Kopiera länken och skicka till gänget!');
+  });
+  $('joinForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var raw=$('joinIn').value.trim(),r=parseRef(raw);
+    if(!r.id||(raw.indexOf('#')<0&&/[:.]/.test(raw))){toast('Det där ser inte ut som en gänglänk. Den ska innehålla ett #.');return}
+    $('joinIn').value='';
+    switchGang(r.id,r.name);showTab('meter');
+  });
+
+  /* ---------- Notiser ---------- */
+  var notifOn=lsGet('stelo-notif')==='1',swReg=null;
+  if('serviceWorker' in navigator&&location.protocol==='https:'){
+    navigator.serviceWorker.register('sw.js').then(function(r){swReg=r},function(){});
+  }
+  function notifSupported(){return 'Notification' in window}
+  function paintNotif(){
+    var txt=$('notifTxt'),btn=$('notifBtn');
+    if(!notifSupported()){
+      txt.textContent='Den här webbläsaren stöder inte notiser. På iPhone fungerar det bara om sidan är tillagd på hemskärmen. Medan sidan är öppen ser du ändå händelser som rutor längst ner.';
+      btn.hidden=true;return;
+    }
+    btn.hidden=false;
+    if(Notification.permission==='denied'){
+      txt.textContent='Notiser är blockerade för sidan. Ändra det i webbläsarens inställningar för webbplatsen.';
+      btn.hidden=true;return;
+    }
+    if(notifOn&&Notification.permission==='granted'){
+      txt.textContent='På. Du får en notis när någon i gänget ändrar stelheten och du är i en annan flik eller app. Sidan måste vara öppen någonstans.';
+      btn.textContent='Stäng av notiser';
+    }else{
+      txt.textContent='Få en notis som "Julia tycker att det är superstelt" när någon i gänget ändrar. Fungerar så länge sidan är öppen i bakgrunden.';
+      btn.textContent='Slå på notiser';
+    }
+  }
+  $('notifBtn').addEventListener('click',function(){
+    if(notifOn&&Notification.permission==='granted'){notifOn=false;lsSet('stelo-notif','0');paintNotif();return}
+    var done=function(p){
+      if(p==='granted'){notifOn=true;lsSet('stelo-notif','1');toast('Notiser är på')}
+      paintNotif();
+    };
+    try{var pr=Notification.requestPermission(done);if(pr&&pr.then)pr.then(done)}catch(e){paintNotif()}
+  });
+  var notifLast=0;
+  function notify(text){
+    if(!document.hidden){toast(text);return}
+    if(!notifOn||!notifSupported()||Notification.permission!=='granted')return;
+    var now=Date.now();if(now-notifLast<4000)return;notifLast=now;
+    var title='Stelometer · '+gangName,opt={body:text,tag:'stelo-'+room,renotify:true};
+    try{
+      if(swReg&&swReg.showNotification)swReg.showNotification(title,opt);
+      else{var n=new Notification(title,opt);n.onclick=function(){window.focus();n.close()}}
+    }catch(e){}
+  }
+
+  /* ---------- Personer ---------- */
+  var meRange=$('meRange');
+  function paintMe(){
+    var has=!!myName;
+    $('nameCard').hidden=has&&!editingName;
+    $('meCard').hidden=!has||editingName;
+    $('nameCancel').hidden=!has;
+    if(!has)return;
+    $('meWho').textContent=myName;
+    var v=myLevel===null?50:Math.round(myLevel);
+    meRange.value=v;
+    $('meNum').textContent=myLevel===null?'–':v;
+    $('meName').textContent=myLevel===null?'Inte satt än':NAMES[labelOf(v)];
+    $('meNote').textContent=myLevel===null?'Dra reglaget för att visa hur stel du känner dig. Du syns i topplistan för '+gangName+'.':'Alla i '+gangName+' ser din nivå direkt.';
+  }
+  var editingName=false;
+  $('nameForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var nm=$('nameIn').value.replace(/\s+/g,' ').trim().slice(0,20);if(!nm)return;
+    myName=nm;lsSet('stelo-name',nm);editingName=false;
+    if(people[myId]){people[myId].n=nm;ps.last=-1;flushPersonal(true)}
+    paintMe();renderPeople();
+  });
+  $('renameMe').addEventListener('click',function(){editingName=true;$('nameIn').value=myName;paintMe();$('nameIn').focus()});
+  $('nameCancel').addEventListener('click',function(){editingName=false;paintMe()});
+  meRange.addEventListener('input',function(){
+    unlock();
+    myLevel=+meRange.value;
+    var v=Math.round(myLevel),lab=labelOf(v);
+    $('meNum').textContent=v;
+    if($('meName').textContent!==NAMES[lab]){$('meName').textContent=NAMES[lab];blip(NOTES[Math.min(6,lab)],.1,'triangle',.07)}
+    people[myId]={n:myName,l:v,ts:Date.now()};
+    renderPeople();pushPersonal();
+  });
+  meRange.addEventListener('change',function(){myLevel=+meRange.value;pushPersonal(true);paintMe()});
+
+  function ago(ts){
+    var m=Math.floor((Date.now()-ts)/60000);
+    if(m<1)return 'nyss';if(m<60)return m+' min sedan';
+    var h=Math.floor(m/60);return h+' h sedan';
+  }
+  function sortedPeople(){
+    var arr=[],cut=Date.now()-12*3600*1000;
+    for(var k in people){if(people[k].ts<cut){delete people[k];continue}arr.push({id:k,n:people[k].n,l:people[k].l,ts:people[k].ts})}
+    arr.sort(function(a,b){return b.l-a.l||b.ts-a.ts});
+    return arr;
+  }
+  function renderPeople(){
+    var arr=sortedPeople(),ol=$('lb');
+    paintGangCountOnly(arr.length);
+    if(curTab!=='people')return;
+    ol.textContent='';
+    if(!arr.length){
+      var e=el('li','empty','Ingen i '+gangName+' har satt sin nivå än. Bli först!');ol.appendChild(e);
+      $('lbSub').textContent='Från stelast till mjukast.';return;
+    }
+    $('lbSub').textContent='Från stelast till mjukast. Nivåer äldre än ett halvdygn försvinner.';
+    var medals=['🥇','🥈','🥉'];
+    arr.forEach(function(p,i){
+      var li=el('li','lbRow'+(p.id===myId?' me':''));
+      li.appendChild(el('div','rank',medals[i]||String(i+1)));
+      var mid=el('div');
+      var nm=el('div','lbName');
+      nm.appendChild(el('b',null,p.n));
+      if(p.id===myId)nm.appendChild(el('span','tag','du'));
+      nm.appendChild(el('small',null,NAMES[labelOf(p.l)]+' · '+ago(p.ts)));
+      mid.appendChild(nm);
+      var bar=el('div','bar'),fill=el('span');
+      fill.style.width=Math.max(3,p.l)+'%';fill.style.background='hsl('+hueOf(p.l)+' 88% 58%)';
+      bar.appendChild(fill);mid.appendChild(bar);
+      li.appendChild(mid);
+      li.appendChild(el('div','lbNum',String(Math.round(p.l))));
+      ol.appendChild(li);
+    });
+  }
+  function paintGangCountOnly(n){
+    $('gCount').textContent=n?(n===1?'1 person har satt sin nivå senaste halvdygnet.':n+' personer har satt sin nivå senaste halvdygnet.'):'Ingen har satt en egen nivå här än.';
+  }
+  setInterval(function(){if(curTab==='people')renderPeople()},30000);
+
+  /* ---------- Lejonchatt ---------- */
+  function fold(s){return s.toLowerCase().replace(/[åä]/g,'a').replace(/ö/g,'o').replace(/[éè]/g,'e').replace(/[^a-z0-9?! ]+/g,' ').replace(/\s+/g,' ').trim()}
+  var recent=[];
+  function pick(arr){
+    var fresh=arr.filter(function(x){return recent.indexOf(x)<0});
+    if(!fresh.length)fresh=arr;
+    var a=fresh[Math.floor(Math.random()*fresh.length)];
+    recent.push(a);if(recent.length>25)recent.shift();
+    return a;
+  }
+  function ctx(){
+    var lvl=Math.round(clamp(target,0,100)),lab=labelOf(lvl),ppl=sortedPeople();
+    return {
+      lvl:lvl,lab:lab,band:lvl<30?'s':lvl<70?'m':'h',
+      label:SHARED_PH[lab],Label:NAMES[lab].toLowerCase(),
+      namn:myName||'kompis',gang:gangName,antal:ppl.length,
+      top:ppl[0]||null,bottom:ppl.length>1?ppl[ppl.length-1]:null,ppl:ppl
+    };
+  }
+  function fill(tpl,c){
+    return tpl.replace(/\{(\w+)\}/g,function(_,k){
+      if(k==='stelast')return c.top?c.top.n:'någon';
+      if(k==='stelastL')return c.top?Math.round(c.top.l):'?';
+      if(k==='mjukast')return c.bottom?c.bottom.n:(c.top?c.top.n:'någon');
+      if(k==='mjukastL')return c.bottom?Math.round(c.bottom.l):(c.top?Math.round(c.top.l):'?');
+      return c[k]!=null?c[k]:'';
+    });
+  }
+
+  /* Varje avsikt har nyckelord och svar. Svar kan vara en lista, en lista per läge (s=mjukt, m=mellan, h=stelt, a=alltid) eller en funktion */
+  var INTENTS=[
+    {id:'bye',k:['hejda','hej da','ses','godnatt','god natt','bye','vi hors','adjo','sov gott','tack for idag'],r:{
+      a:['Hejdå {namn}! Jag stannar här och vaktar mätaren.','Ses! Glöm inte att sträcka på dig innan du går.','Hejdå! Jag vinkar med svansen. Du ser det inte, men lita på mig.'],
+      s:['Godnatt… zzz… jag somnade redan innan du sa hejdå.'],
+      h:['Hejdå! Jag skulle vinka, men armen har fastnat i 90 graders vinkel.']}},
+    {id:'greet',k:['hej','hallå','halla','tja','tjena','tjenare','hejsan','morsning','god morgon','godmorgon','hallo','yo','tjabba','hey','hi'],r:{
+      s:['Mmmhej {namn}… förlåt, jag låg och myste. Mätaren står på {lvl}, så allt är mjukt och fint.','Tjena {namn}! Jag är så avslappnad att jag nästan rinner av stolen.','Hej hej! Välkommen till den mjukaste hörnan av internet.'],
+      m:['Hej {namn}! Läget är {label} här. Vad vill du snacka om?','Tjenare! Jag är redo för samtal, men inte för stretching.','Hallå där! Fråga mig vad som helst. Jag svarar med 100 procent självförtroende och 12 procent kunskap.'],
+      h:['H-hej. Jag kan inte vinka, armarna har låst sig.','Hej {namn}! Ursäkta att jag inte vänder mig om. Nacken står på {lvl}.','Hej! Prata långsamt, jag är för stel för att hänga med i snabba meningar.']}},
+    {id:'cmd',k:[],r:null},
+    {id:'stiffest',k:['stelast','mest stel','vem ar mest','topplist','vem leder','vem vinner','vinner','etta','forst i listan','stelaste'],r:function(c){
+      if(!c.top)return ['Ingen i {gang} har satt sin egen nivå än. Gå till fliken Personer och bli först, så har jag något att skvallra om.','Topplistan är tom! Det är antingen ett tecken på att alla är superavslappnade, eller att ingen har hittat fliken Personer än.'];
+      if(c.antal===1)return ['Bara {stelast} har satt sin nivå, på {stelastL}. Hen vinner alltså. Och förlorar. Samtidigt.','{stelast} är ensam i topplistan med {stelastL}. Det är lätt att vara stelast när ingen annan är med.'];
+      return ['Just nu är det {stelast} som är stelast, med {stelastL}. Någon borde ge hen en massage.','{stelast} toppar listan på {stelastL}. Jag har sett mjukare tegelstenar.','Stelast i {gang} är {stelast}. Respekt, men också… sträck på dig?','Guldmedaljen i stelhet går till {stelast} med {stelastL}! Priset är en stel applåd.'];
+    }},
+    {id:'softest',k:['mjukast','minst stel','vem ar minst','sist i listan','jumbo','mjukaste','sist'],r:function(c){
+      if(!c.top)return ['Ingen har satt sin nivå än, så alla är lika mjuka just nu. Eller lika stela. Schrödingers stelhet.'];
+      return ['Mjukast är {mjukast} med {mjukastL}. Hen är i princip ett gosedjur just nu.','{mjukast} ligger sist med {mjukastL}. Så avslappnad att hen nog behöver en filt.','Det är {mjukast} som är mjukast. Jag misstänker att hen är gjord av marshmallows.'];
+    }},
+    {id:'level',k:['hur stel','hur mjuk','niva','matar','stelhet','vad star','star det','lage','laget i ganget','hur ar det i ganget'],r:{
+      a:['Mätaren står på {lvl} av 100. Det är alltså {label} i {gang}, enligt min mycket vetenskapliga lejonhjärna.'],
+      s:['{lvl}! Det är så mjukt att man skulle kunna bre det på en macka.','Bara {lvl}. Jag har inte varit så här avslappnad sedan jag var en liten kattunge.'],
+      m:['{lvl} just nu. {Label}, som en ostbit som legat framme en timme.','Den står på {lvl}. Inte bra, inte dåligt. Som en lagom ljummen kopp te.'],
+      h:['{lvl}!! Jag har slutat blinka för att spara energi.','Mätaren visar {lvl}. Mina morrhår står rakt ut som antenner.','{lvl}. Jag är så stel att jag tar emot radiosignaler.']}},
+    {id:'howareyou',k:['hur mar','hur ar laget','hur ar det','hur kanns','kanner du','mar du','allt bra','laget','hur har du det'],r:{
+      s:['Jag mår som en nybakad kanelbulle. Varm, mjuk och lite kladdig.','Bättre än någonsin! Jag har inte spänt en enda muskel idag.','Fantastiskt. Jag är så avslappnad att min man har somnat.'],
+      m:['Helt okej! Lite stel i svansen, men det är lejonnormalt.','Ungefär {label}. Som en tisdag i lejonform.','Det rullar på. Långsamt, men det rullar.'],
+      h:['Ärligt talat? Jag känner mig som en strykbräda med man.','Inte superbra. Jag försökte nysa nyss och det lät som en dörr som knarrar.','Jag mår som en frusen fiskpinne. Rak, kall och lite ledsen.']}},
+    {id:'tips',k:['tips','rad','hjalp mig','hur blir','hur gor man','vad ska jag gora','mindre stel','bli mjuk','stretch','avslappn','slappna av','ont i','spand','jag ar stel','kanner mig stel'],r:{
+      a:['Prova att rulla axlarna tio gånger. Jag gör det också, men på mig ser det ut som en jordbävning.','Drick vatten, sträck på dig och skratta åt något dumt. Jag rekommenderar mig själv.','Ett lejontips. Gäspa jättestort. Det löser det mesta, inklusive dåligt humör.','Ligg i solen i tre timmar. Det är vad jag gör, och titta hur bra det har gått för mig.','Skaka loss som om ingen tittar. Om någon tittar, skaka mer.','Andas in i fyra sekunder, ut i sex. Om du hör ett ryt efteråt var det bara jag som provade samtidigt.'],
+      h:['Med mätaren på {lvl} rekommenderar jag akut gosning. Med vem som helst. Eller en kudde.']}},
+    {id:'joke',k:['skamt','vits','rolig','kul','berätta nagot','beratta nagot','skratta','haha','lol','humor','fanny','dad joke','ordvits'],r:{
+      a:['Vad säger ett lejon när det äter en clown? "Det här smakar lite roligt."','Vad kallar man ett stelt lejon? En lejon-planka. Förlåt. Jag är inte stolt.','Hur vet man att ett lejon har varit i kylskåpet? Det finns tassavtryck i smöret. Mjukt som smör, förresten. Min favoritnivå.','Varför fick lejonet sparken från kontoret? Det tog kattlur på alla möten.','Vad har ett lejon och en hammare gemensamt? Inget alls, men jag ville se om du läste ända hit.','Varför spelar lejon aldrig kort i djungeln? Det finns för många geparder. Fattar du? Fusk-geparder. Nej? Okej.','Min mamma sa alltid att jag var stel som en pinne. Sen insåg hon att jag satt på en.','Vilket är lejonets favoritämne i skolan? Ryt-mik.'],
+      h:['Jag skulle berätta ett skämt, men jag är för stel för att få fram poängen. Okej, ett kort. Varför är jag stel? Pinsamt nog vet ingen.']}},
+    {id:'ai',k:['ar du ai','ar du en ai','ai','robot','chatgpt','claude','manniska','ar du riktig','ar du en bot','bot','dator','programmerad','maskin'],r:{
+      a:['AI? Jag? Nej då, jag är ett helt vanligt lejon som råkar bo i en webbsida och kan skriva. Helt normalt.','Jag är cirka 40 procent AI, 60 procent man och 100 procent charm. Matten stämmer inte, men det gör inte jag heller.','Jag har ingen superdator i hjärnan. Jag har en lejonhjärna och en väldigt bra lista. Det räcker långt.','Robot? Kan en robot göra så här? *viftar med svansen*. Precis. Kan den inte.']}},
+    {id:'about',k:['vem ar du','vad heter du','ditt namn','vad ar du','lejon','hur gammal','din alder','var bor du','vad gor du','beratta om dig'],r:{
+      a:['Jag är Stelometerns officiella maskot. Lön? Noll kronor och en oändlig mängd klappar.','Jag heter Lejonet. Mina vänner kallar mig Lejonet. Mina fiender kallar mig också Lejonet. Det är förvirrande.','Jag bor i en mätare och känner av hur stelt det är i {gang}. Det är ett nischat jobb, men någon måste göra det.','Hur gammal jag är? I lejonår är jag ungefär "tillräckligt gammal för att vara trött, för ung för att erkänna det".']}},
+    {id:'love',k:['alskar','kar i','gillar dig','puss','kram','sot','gullig','snygg','bast','bra lejon'],r:{
+      a:['Åh, nu rodnar jag under pälsen. Man ser det inte, men lita på mig.','Kärlek är det enda som gör mig mjuk på riktigt. Det och värme. Och glass.','Tack! Jag har jobbat hårt på den här manen.'],
+      s:['Kram! Mjuk kram, eftersom vi ligger på {lvl}. Bästa sortens kram.'],
+      h:['Jag gillar dig också! Men jag kramar inte när mätaren är över 70. Säkerhetsskäl. Du kan bli knäckt.']}},
+    {id:'insult',k:['dum','ful','trakig','kass','hatar','idiot','dalig','sämst','samst','tyst','irriterande','jobbig','loser'],r:{
+      a:['Aj. Det där gjorde ont i min stolthet. Och jag är ett lejon, så stoltheten är ganska stor.','Jag förlåter dig. Lejon är ädla. Och lite långsinta. Jag har skrivit upp ditt namn.','Tråkig? Jag bor i en mätare och skjuter konfetti när det blir 100. Jag är det roligaste du sett idag.','Okej. Jag går och surar i hörnet av mätaren. Det gröna hörnet. Det är mest mjukt där.']}},
+    {id:'food',k:['mat ','ata','hungrig','fika','kaka','bulle','kott','godis','glass','pizza','frukost','lunch','middag','snacks'],r:{
+      a:['Mat? Jag tar gärna en köttbulle. Eller tolv. Fika med kanelbulle går också bra, jag är flexibel.','Jag är så hungrig att jag skulle kunna äta en zebra. Men en räksmörgås duger.','Fika är det bästa svenska påfundet. Efter Stelometern, då.'],
+      h:['När jag är så här stel äter jag bara mjuk mat. Pannkakor, glass och komplimanger.']}},
+    {id:'sleep',k:['sova','trott','somn','tupplur','vila','vaken','sover','gaspa'],r:{
+      s:['Sova? Jag gör inget annat. Lejon sover runt 20 timmar om dygnet, så jag ligger efter.','Zzz… förlåt, sa du något? Jag halvsov.'],
+      m:['En tupplur skulle sänka mätaren minst 20 steg. Det är medicinskt bevisat av mig.','Jag är lagom trött. Perfekt läge för en "kort" tupplur på tre timmar.'],
+      h:['Jag skulle vilja sova, men jag är för stel för att lägga mig ner. Jag sover stående som en häst nu.']}},
+    {id:'school',k:['tenta','plugg','skola','uni','kurs','forelasning','laxa','prov','studera','uppsats','seminarium','deadline'],r:{
+      a:['Plugg gör alla stela. Ta en paus var 45:e minut och sträck på dig. Eller ta en tupplur som jag, det funkar också.','Tentor är som att lyfta en zebra. Tungt i stunden, men sen känner man sig stark.','Jag pluggade en gång. Det var till en tupplursexamen. Jag fick högsta betyg.','Deadline? Jag känner inte till det ordet. Lejon har bara "dead" och "line", och båda låter läskiga.']}},
+    {id:'work',k:['jobb','jobba','chef','kontor','mote','arbete','lon','kollega'],r:{
+      a:['Jobb? Mitt jobb är att sitta här och vara söt. Jag är väldigt bra på det.','Om chefen är stel, dra upp mätaren. Ett sätt att kommunicera utan att säga något.','Möten gör mig stel. Det är därför jag alltid tar kattlur under dem.']}},
+    {id:'party',k:['fest','helg','fredag','lordag','party','sittning','dansa','dans','ol','vin ','krog','gasque','pregame','efterfest'],r:{
+      s:['Fest! Mätaren är så låg att jag kan dansa limbo.','Helg! Jag har redan bytt till myskläder. Jag har inga kläder, men känslan finns där.'],
+      m:['Jag är på! Jag tar med rytet och konfettin.','Fredag är min favoritdag. Den låter nästan som "ryt-dag".'],
+      h:['Fest låter kul, men jag dansar som en strykbräda just nu.','Med {lvl} i stelhet är min enda dansrörelse "staty". Den är populär, men lite tråkig.']}},
+    {id:'training',k:['gym','trana','traning','lopning','springa','yoga','motion','styrka','svettas','pass '],r:{
+      a:['Gym? Jag tränar varje dag. Jag lyfter mitt eget huvud. Det väger mycket, det är manen.','Yoga är bra mot stelhet. Min favoritposition är "liggande lejon". Som "nedåtgående hund", fast bättre.','Jag sprang en gång. Det var efter en zebra. Zebran vann.']}},
+    {id:'weather',k:['vader','regn','sol','kallt','varmt','sno','blasigt','vinter','sommar','host'],r:{
+      a:['Jag vet inte hur vädret är, jag bor i en webbsida. Men här inne är det {label}.','Är det kallt ute blir allt stelare. Det är därför lejon bor på savannen och inte i Norrland.','Sol är bäst. Då ligger jag på en klippa och blir mjuk som smör.']}},
+    {id:'meaning',k:['mening','livet','varfor','filosofi','universum','existens','tanker du'],r:{
+      a:['Meningen med livet är att hitta den perfekta stelhetsnivån. Jag tror att den är 42. Eller 43. Det varierar.','Varför? Det frågar jag mig själv varje gång någon drar mätaren till 100.','Livet är som Stelometern. Ibland mjukt, ibland stelt, och ibland drar någon i pilen utan att fråga.']}},
+    {id:'thanks',k:['tack','tackar','tusen tack','schysst','snallt'],r:{
+      a:['Varsågod! Det kostar ingenting. Men en klapp på manen uppskattas.','Ingen orsak! Jag är ett serviceinriktat lejon.','Tack själv! Du är minst {lvl} procent trevlig.']}},
+    {id:'roar',k:['ryt','vral','raawr','rawr','raaawr','roar','morr','grrr','grr'],r:{
+      a:['RAAAAWR! Oj, det var mycket. Ursäkta grannarna.','Grrr… nej vänta, det där var magen. RAAAWR! Där.'],
+      h:['RAAAWR! Jag var redan i rytläge, så det kom gratis.']}},
+    {id:'gangq',k:['vilket gang','mitt gang','ganget','hur manga','vilka ar med','vem ar med','medlem'],r:function(c){
+      if(!c.antal)return ['Du är i {gang}. Ingen har satt sin egen nivå senaste halvdygnet. Väldigt lugnt gäng. Eller väldigt sovande.'];
+      var names=c.ppl.slice(0,5).map(function(p){return p.n}).join(', ');
+      return ['Du är i {gang}. {antal} har satt sin nivå nyligen, bland annat '+names+'.','I {gang} har {antal} personer visat hur stela de är. Modigt av dem.'];
+    }},
+    {id:'help',k:['hur funkar','vad kan du','hjalp','instruktion','hur anvander','vad gor stelometern','forklara','fragor'],r:{
+      a:['Dra i pilen på Mätaren för att visa hur stelt det är i gänget. Under Personer ställer du in din egen nivå och ser topplistan. Under Gäng skapar du nya gäng och delar länken. Och mig kan du fråga om nästan vad som helst. Typ.','Jag kan berätta hur stelt det är, vem som är stelast, ge tips, dra skämt och flytta mätaren åt dig. Skriv till exempel "sätt mätaren till 80".']}}
+  ];
+  var YESNO_START=['ar','kan','ska','borde','har','blir','kommer','vill','far','gillar','tycker','maste','finns'];
+  var YESNO={
+    s:['Ja! Allt känns som ett ja när mätaren är så här låg.','Absolut. Mitt mjuka lejonhjärta säger ja.','Kanske. Fråga igen efter min tupplur.'],
+    m:['Ja. Min lejoninstinkt säger ja.','Nej, och det är jag 87 procent säker på.','Kanske. Fråga igen när mätaren står under 50.','Det beror på. Främst på hur mycket fika det finns.'],
+    h:['Nej. Jag är för stel för att säga ja just nu.','Svaret är oklart. Stelheten blockerar min kristallkula.','JA! Förlåt att jag skrek, det är svårt att prata lågt med så här stela käkar.']
+  };
+  var FALLBACK=['Hmm, det där förstod jag bara till hälften. Den andra hälften åt jag upp.','Intressant! Jag har ingen aning om vad du menar, men jag nickar instämmande. Så gott det går, det är {label} här.','Det får du nog fråga en människa om. Jag är bara ett lejon med en mätare.','Jag hörde inte riktigt, jag hade manen i öronen. Fråga mig om stelheten, vem som är stelast eller be om ett skämt!','Bra fråga. Så bra att jag behöver tänka på den i ungefär tre tupplurar.','Mitt lejonsvar på det är "hmm". Det är ett djupt hmm, om det hjälper.'];
+
+  function scoreIntent(it,ft,toks){
+    var sc=0;
+    it.k.forEach(function(key){
+      if(key.indexOf(' ')>=0){if((' '+ft+' ').indexOf(' '+key)>=0)sc+=2}
+      else{for(var i=0;i<toks.length;i++){if(toks[i]===key||(key.length>=3&&toks[i].indexOf(key)===0)||(key.length>=5&&toks[i].indexOf(key)>0)){sc+=1+(key.length>5?.5:0);break}}}
+    });
+    return sc;
+  }
+  function answers(r,c){
+    if(typeof r==='function')return r(c);
+    if(Array.isArray(r))return r;
+    return (r[c.band]||[]).concat(r.a||[]);
+  }
+  function lionReply(text){
+    var c=ctx(),ft=fold(text),toks=ft.replace(/[?!]/g,' ').split(' ').filter(Boolean);
+
+    /* Kommando att flytta mätaren, t.ex. "sätt mätaren till 80" */
+    var num=ft.match(/\b(\d{1,3})\b/);
+    if(num&&/\b(satt|stall|dra|andra|hoj|sank|flytta|gor)\b/.test(ft)&&/\b(till|pa)\b|matar|niva/.test(ft)){
+      var n=clamp(parseInt(num[1],10),0,100);
+      target=n;vel+=(n>pos?1:-1)*120;push(true);hint.classList.add('gone');
+      var lab=labelOf(n);
+      return pick(['Klart! Jag drog mätaren till '+n+'. Nu är det '+SHARED_PH[lab]+' för alla i {gang}.','Fixat, '+n+' it is. '+QUIPS[lab],'Jag lutade mig mot pilen tills den stod på '+n+'. Alla i {gang} ser det nu.']);
+    }
+    if(/\b(stelare|hoj|upp)\b/.test(ft)&&/\b(gor|dra|mataren|matare|lite|mer)\b/.test(ft)){
+      var u=clamp(Math.round(target)+20,0,100);target=u;push(true);
+      return 'Okej, upp med den! Mätaren står nu på '+u+'. '+QUIPS[labelOf(u)];
+    }
+    if(/\b(mjukare|sank|ner|ned)\b/.test(ft)&&/\b(gor|dra|mataren|matare|lite|mer)\b/.test(ft)){
+      var dn=clamp(Math.round(target)-20,0,100);target=dn;push(true);
+      return 'Ahh, skönt. Mätaren står nu på '+dn+'. '+QUIPS[labelOf(dn)];
+    }
+
+    var best=null,bs=0;
+    INTENTS.forEach(function(it){
+      if(!it.r)return;
+      var s=scoreIntent(it,ft,toks);
+      if(s>bs){bs=s;best=it}
+    });
+    if(best)return pick(answers(best.r,c));
+    if(/\?$/.test(ft)||YESNO_START.indexOf(toks[0])>=0){
+      return pick(YESNO[c.band]);
+    }
+    return pick(FALLBACK);
+  }
+
+  var chatLog=$('chatLog'),chatStarted=false,busy=false;
+  function addMsg(who,text){
+    var m=el('div','msg '+who,text);chatLog.appendChild(m);chatLog.scrollTop=chatLog.scrollHeight;return m;
+  }
+  function startChat(){
+    if(chatStarted)return;chatStarted=true;
+    addMsg('lion',fill('Hej {namn}! Jag är Lejonet. Fråga mig hur stelt det är, vem som är stelast i {gang} eller be om ett skämt. Jag kan till och med flytta mätaren om du ber snällt.',ctx()));
+    var chips=['Hur stelt är det?','Vem är stelast?','Berätta ett skämt','Ge mig ett tips','Är du en AI?','Sätt mätaren till 80'];
+    chips.forEach(function(txt){
+      var b=el('button','chip',txt);b.type='button';
+      b.addEventListener('click',function(){send(txt)});
+      $('chips').appendChild(b);
+    });
+  }
+  function send(text){
+    text=(text||'').trim();if(!text||busy)return;
+    unlock();busy=true;
+    addMsg('me',text);
+    var reply=fill(lionReply(text),ctx());
+    var typ=el('div','msg lion');var dots=el('span','typing');dots.innerHTML='<i></i><i></i><i></i>';typ.appendChild(dots);
+    typ.setAttribute('aria-label','Lejonet skriver');
+    chatLog.appendChild(typ);chatLog.scrollTop=chatLog.scrollHeight;
+    var delay=rm?300:500+Math.min(1600,reply.length*14);
+    setTimeout(function(){
+      chatLog.removeChild(typ);addMsg('lion',reply);busy=false;
+      blip(pos>=90?160:420,.12,'sine',.07,pos>=90?.7:1.4);
+    },delay);
+  }
+  $('chatForm').addEventListener('submit',function(e){e.preventDefault();var v=$('chatIn').value;$('chatIn').value='';send(v)});
+
+  /* ---------- Start ---------- */
+  paintNotif();
+  var startRef=parseRef(location.hash);
+  if(startRef.id){connect(startRef.id,startRef.name)}
   else{
-    setSync('Ansluter till den delade nivån…');
-    var es=new EventSource(base+'/sse?since=latest');
-    es.addEventListener('open',function(){setSync('Live: alla med länken ser samma nivå',true)});
-    es.addEventListener('message',onMsg);
-    es.onerror=function(){setSync('Tappade anslutningen. Försöker igen…')};
+    var lastRoom=cleanId(lsGet('stelo-last')||'');
+    var lg=lastRoom&&findGang(lastRoom);
+    if(lg)connect(lg.id,lg.name);else connect(LEGACY,'Startgänget');
   }
+  if(!myName)paintMe();
   requestAnimationFrame(function(n){last=n;frame(n)});
 })();
 </script>
