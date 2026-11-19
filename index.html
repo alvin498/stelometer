@@ -103,6 +103,10 @@ button{
 button:hover{background:var(--pill)}
 button:active{transform:translateY(4px);box-shadow:0 0 0 var(--line)}
 button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
+.sync{margin:0;display:flex;align-items:center;gap:8px;font-size:14px;text-align:center}
+.sync::before{content:"";flex:none;width:10px;height:10px;border-radius:50%;background:#9a8f86;border:2px solid var(--line)}
+.sync.live::before{background:#2fd16a;animation:blink 1.6s ease-in-out infinite}
+@keyframes blink{50%{transform:scale(1.35)}}
 .bg{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
 .bg i{position:absolute;border-radius:50%;background:var(--pill);opacity:.22;animation:drift 14s ease-in-out infinite alternate}
 .bg i:nth-child(1){width:180px;height:180px;left:-40px;top:12%}
@@ -116,7 +120,7 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
 @keyframes boop{0%{transform:scale(1)}30%{transform:scale(1.1,.86)}60%{transform:scale(.94,1.08)}100%{transform:scale(1)}}
 @keyframes zzz{0%{opacity:0;transform:translate(0,8px)}20%{opacity:1}100%{opacity:0;transform:translate(12px,-26px)}}
 @media (prefers-reduced-motion:reduce){
-  .bg i,.sleepy .zz,.bubble.pop,#lionWrap.boop{animation:none}
+  .bg i,.sleepy .zz,.bubble.pop,#lionWrap.boop,.sync.live::before{animation:none}
   .wedge{transition:none}
 }
 </style>
@@ -204,6 +208,7 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
         <button type="button" id="rnd">Slumpa</button>
         <button type="button" id="mute" aria-pressed="false">Ljud: på</button>
       </div>
+      <p class="sync" id="sync" role="status">Ansluter till den delade nivån…</p>
     </div>
   </section>
 </main>
@@ -358,6 +363,7 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
     var ang=Math.atan2(dy,dx)*180/Math.PI;
     if(ang<0)ang=ang<-90?180:0;
     target=clamp((180-ang)/1.8,0,100);
+    push();
   }
   wrap.addEventListener('pointerdown',function(e){
     unlock();dragging=true;hint.classList.add('gone');
@@ -365,19 +371,19 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
     setFrom(e);e.preventDefault();
   });
   wrap.addEventListener('pointermove',function(e){if(dragging)setFrom(e)});
-  ['pointerup','pointercancel','lostpointercapture'].forEach(function(n){wrap.addEventListener(n,function(){dragging=false})});
+  ['pointerup','pointercancel','lostpointercapture'].forEach(function(n){wrap.addEventListener(n,function(){var was=dragging;dragging=false;if(was)push(true)})});
   svg.addEventListener('keydown',function(e){
     var d=0;
     if(e.key==='ArrowRight'||e.key==='ArrowUp')d=5;
     else if(e.key==='ArrowLeft'||e.key==='ArrowDown')d=-5;
-    else if(e.key==='Home'){target=0;e.preventDefault();unlock();return}
-    else if(e.key==='End'){target=100;e.preventDefault();unlock();return}
-    if(d){unlock();hint.classList.add('gone');target=clamp(target+d,0,100);e.preventDefault()}
+    else if(e.key==='Home'){target=0;push(true);e.preventDefault();unlock();return}
+    else if(e.key==='End'){target=100;push(true);e.preventDefault();unlock();return}
+    if(d){unlock();hint.classList.add('gone');target=clamp(target+d,0,100);push(true);e.preventDefault()}
   });
   $('rnd').addEventListener('click',function(){
     unlock();hint.classList.add('gone');
     var n;do{n=Math.random()*100}while(Math.abs(n-target)<25);
-    target=n;vel+=(n>pos?1:-1)*160;
+    target=n;vel+=(n>pos?1:-1)*160;push(true);
   });
   var muteBtn=$('mute');
   function paintMute(){muteBtn.textContent=muted?'Ljud: av':'Ljud: på';muteBtn.setAttribute('aria-pressed',muted?'true':'false')}
@@ -521,7 +527,47 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
     requestAnimationFrame(frame);
   }
 
-  setTimeout(function(){target=55},450);
+  var sid=Math.random().toString(36).slice(2,10),syncEl=$('sync'),ref=null,wBusy=false,lastSent=-1,pendTimer=null,gotRemote=false,remoteLevel=55,canWrite=true;
+  function setSync(txt,live){syncEl.textContent=txt;syncEl.className=live?'sync live':'sync'}
+  function flush(){
+    if(!ref||wBusy||!canWrite)return;
+    var v=Math.round(target);
+    if(v===lastSent)return;
+    wBusy=true;lastSent=v;
+    ref.set({level:v,by:sid,at:Date.now()}).then(function(){
+      wBusy=false;
+      if(Math.round(target)!==lastSent)flush();
+    },function(){
+      wBusy=false;canWrite=false;target=remoteLevel;
+      setSync('Du ser nivån live men kan inte ändra den.',true);
+    });
+  }
+  function push(now){
+    if(!ref||!canWrite)return;
+    if(now){clearTimeout(pendTimer);pendTimer=null;flush();return}
+    if(pendTimer)return;
+    pendTimer=setTimeout(function(){pendTimer=null;flush()},140);
+  }
+  window.push=push;
+  setTimeout(function(){if(!gotRemote)target=55},450);
+  if(!window.claude||!window.claude.use){setSync('Delning är inte tillgänglig här. Bara du ser ändringar.')}
+  else{
+    window.claude.use('db').then(function(db){
+      if(!db){setSync('Delning är inte tillgänglig här. Bara du ser ändringar.');return}
+      ref=db.collection('state').doc('meter');
+      var to=setTimeout(function(){if(!gotRemote)setSync('Når inte den delade nivån än…')},10000);
+      ref.onSnapshot(function(s){
+        if(!s.fromCache)clearTimeout(to);
+        var d=s.exists?s.data():null,first=!gotRemote;
+        gotRemote=true;
+        if(canWrite)setSync('Live: alla ser samma nivå',true);
+        if(d&&typeof d.level==='number'){
+          remoteLevel=d.level;
+          if(d.by!==sid&&!dragging){target=clamp(d.level,0,100);hint.classList.add('gone')}
+        }else if(first){target=55}
+      },function(){setSync('Anslutningen till den delade nivån bröts. Bara du ser ändringar.')});
+    },function(){setSync('Delning är inte tillgänglig här. Bara du ser ändringar.')});
+  }
   requestAnimationFrame(function(n){last=n;frame(n)});
 })();
 </script>
