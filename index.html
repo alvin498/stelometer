@@ -129,7 +129,7 @@ button.small{font-size:15px;padding:5px 12px;border-radius:11px;box-shadow:0 3px
 .tab{border:0;box-shadow:none;border-radius:999px;padding:8px 16px;font-size:16px;background:transparent;white-space:nowrap}
 .tab:active{transform:none}
 .tab[aria-selected="true"]{background:var(--pill)}
-@media (max-width:460px){.tabs{width:100%;box-sizing:border-box;gap:2px;padding:4px}.tab{flex:1;padding:8px 6px;font-size:14.5px}}
+@media (max-width:460px){.tabs{width:100%;box-sizing:border-box;gap:2px;padding:4px}.tab{flex:1;padding:8px 3px;font-size:13.5px}}
 .panel{width:100%;display:flex;flex-direction:column;align-items:center;gap:16px}
 
 /* Kort i flikarna */
@@ -173,6 +173,24 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
 .bar span{display:block;height:100%;border-radius:99px;transition:width .4s}
 .lbNum{font:700 26px var(--font-display);font-variant-numeric:tabular-nums;min-width:2ch;text-align:right}
 .empty{padding:14px;text-align:center;border:2.5px dashed #1d1424;border-radius:14px;opacity:.8}
+.lbRow.click{cursor:pointer}
+.lbRow.click:hover{background:#fff8ea}
+.lbRow.me.click:hover{background:hsl(var(--h) 90% 84%)}
+.lbRow.click:focus-visible{outline:3px dashed #1d1424;outline-offset:2px}
+.lbAct{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap;padding-top:4px}
+.lbAct button{flex:1 1 auto}
+button.danger{background:#ffd9d9}
+button.danger:hover{background:#ff9b9b}
+.bl{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-direction:column;gap:6px}
+.bl li{display:flex;align-items:center;gap:8px;padding:6px 10px;border:2.5px solid #1d1424;border-radius:12px;background:#fff}
+.bl li span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.newBanner{font-size:15px;padding:6px 16px;border-radius:999px;background:var(--pill)}
+.guide{display:flex;flex-direction:column;gap:14px;width:100%;max-width:620px;align-items:center}
+.gstep{display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 14px;align-items:start}
+.gico{grid-row:span 3;width:52px;height:52px;border-radius:16px;border:3px solid #1d1424;background:var(--pill);display:grid;place-items:center;font-size:26px}
+.gstep h2{margin:0}
+.gstep p{margin:2px 0 0}
+.gstep .row{margin-top:8px}
 .tag{display:inline-block;font-size:12px;padding:1px 8px;border-radius:99px;background:var(--pill);border:2px solid #1d1424}
 
 /* Gänglista */
@@ -226,9 +244,11 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
   <nav class="tabs" role="tablist" aria-label="Vyer">
     <button type="button" class="tab" role="tab" id="t-meter" aria-controls="p-meter" aria-selected="true">Mätaren</button>
     <button type="button" class="tab" role="tab" id="t-people" aria-controls="p-people" aria-selected="false">Personer</button>
-    <button type="button" class="tab" role="tab" id="t-chat" aria-controls="p-chat" aria-selected="false">Lejonchatt</button>
+    <button type="button" class="tab" role="tab" id="t-chat" aria-controls="p-chat" aria-selected="false">Lejonet</button>
     <button type="button" class="tab" role="tab" id="t-gangs" aria-controls="p-gangs" aria-selected="false">Gäng</button>
+    <button type="button" class="tab" role="tab" id="t-guide" aria-controls="p-guide" aria-selected="false">Guide</button>
   </nav>
+  <button type="button" class="newBanner" id="guideBanner" hidden>👋 Ny här? Tryck för en snabb guide</button>
 
   <!-- Gemensam mätare -->
   <section class="panel" id="p-meter" role="tabpanel" aria-labelledby="t-meter">
@@ -380,13 +400,15 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
       </form>
     </div>
 
+    <div class="card" id="masterCard"></div>
+
     <div class="card">
       <h2>Skapa nytt gäng</h2>
       <form class="row" id="createForm">
         <input class="field" id="createIn" maxlength="30" placeholder="T.ex. Fikagänget" required aria-label="Namn på nytt gäng">
         <button class="pri">Skapa</button>
       </form>
-      <p class="muted">Du hamnar direkt i det nya gänget. Skicka sedan länken till dem som ska vara med.</p>
+      <p class="muted">Du hamnar direkt i det nya gänget och blir dess mästare. Skicka sedan länken till dem som ska vara med.</p>
     </div>
 
     <div class="card">
@@ -406,6 +428,51 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
       <h2>Notiser</h2>
       <p class="muted" id="notifTxt"></p>
       <div class="row"><button type="button" id="notifBtn">Slå på notiser</button></div>
+    </div>
+
+  </section>
+
+  <!-- Guide -->
+  <section class="panel" id="p-guide" role="tabpanel" aria-labelledby="t-guide" hidden>
+    <div class="guide">
+      <div class="card gstep"><div class="gico" aria-hidden="true">🎯</div>
+        <h2>1. Mätaren</h2>
+        <p>Dra i pilen eller tryck någonstans på mätaren för att visa hur stelt det är i gänget just nu. Alla som har länken ser samma pil direkt. Slumpa väljer en nivå åt dig, och lejonet reagerar på allt från sovande kudde till total stelkramp.</p>
+        <div class="row"><button type="button" class="small" data-go="meter">Visa mätaren</button></div></div>
+
+      <div class="card gstep"><div class="gico" aria-hidden="true">🙋</div>
+        <h2>2. Din egen nivå</h2>
+        <p>Under Personer skriver du ditt namn en gång. Sedan drar du i reglaget för att visa hur stel just du känner dig. Topplistan visar alla i gänget från stelast till mjukast.</p>
+        <div class="row"><button type="button" class="small" data-go="people">Visa personer</button></div></div>
+
+      <div class="card gstep"><div class="gico" aria-hidden="true">👉</div>
+        <h2>3. Ändra någon annans stelhet</h2>
+        <p>Tryck på en person i topplistan. Då kan du göra hen stelare eller mjukare, tio steg per tryck. Hen får en notis om vem som gjorde det. Mästaren kan stänga av det här.</p>
+        <div class="row"><button type="button" class="small" data-go="people">Testa i topplistan</button></div></div>
+
+      <div class="card gstep"><div class="gico" aria-hidden="true">👥</div>
+        <h2>4. Gäng</h2>
+        <p>Under Gäng skapar du nya gäng, kopierar länken och byter mellan dina gäng. Varje gäng har en egen mätare och en egen topplista. Den som har länken är med.</p>
+        <div class="row"><button type="button" class="small" data-go="gangs">Visa gäng</button></div></div>
+
+      <div class="card gstep"><div class="gico" aria-hidden="true">👑</div>
+        <h2>5. Mästaren</h2>
+        <p>Den som skapar ett gäng blir mästare. Mästaren kan ta bort personer och dubbletter från topplistan, byta gängets namn och bestämma om man får ändra varandras stelhet. Har du flera enheter kan du kopiera en mästarlänk och öppna den på den andra. Äldre gäng utan mästare kan uppgraderas under Gäng.</p>
+        <div class="row"><button type="button" class="small" data-go="gangs">Visa mästarinställningar</button></div></div>
+
+      <div class="card gstep"><div class="gico" aria-hidden="true">🦁</div>
+        <h2>6. Lejonet</h2>
+        <p>Chatta med lejonet om allt från stelhet till fika. Fråga vem som är stelast, be om ett skämt eller skriv "sätt mätaren till 80". Du kan också skriva "gör Julia stelare".</p>
+        <div class="row"><button type="button" class="small" data-go="chat">Säg hej till lejonet</button></div></div>
+
+      <div class="card gstep"><div class="gico" aria-hidden="true">🔔</div>
+        <h2>7. Notiser</h2>
+        <p>Slå på notiser under Gäng. Då får du till exempel "Julia tycker att det är superstelt" när sidan ligger i bakgrunden. På iPhone fungerar det bara om sidan är tillagd på hemskärmen.</p>
+        <div class="row"><button type="button" class="small" data-go="gangs">Slå på notiser</button></div></div>
+
+      <div class="card gstep"><div class="gico" aria-hidden="true">💡</div>
+        <h2>Bra att veta</h2>
+        <p>Nivåer sparas i ungefär ett halvdygn. Samma namn räknas som en person i topplistan, även om det används på flera telefoner. Det finns inga konton, så håll länken inom gänget.</p></div>
     </div>
   </section>
 </main>
@@ -738,10 +805,10 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
   }
 
   /* ---------- Flikar ---------- */
-  var TABS=['meter','people','chat','gangs'],curTab='meter';
+  var TABS=['meter','people','chat','gangs','guide'],curTab='meter';
   var chatMood=$('chatMood');
   function showTab(name,focus){
-    curTab=name;
+    curTab=name;if(name!=='meter')parts.length=0;
     TABS.forEach(function(n){
       var on=n===name;
       $('t-'+n).setAttribute('aria-selected',on?'true':'false');
@@ -751,6 +818,7 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
     if(focus)$('t-'+name).focus();
     if(name==='people')renderPeople();
     if(name==='gangs')renderGangs();
+    if(name==='guide'){lsSet('stelo-guide','1');$('guideBanner').hidden=true;window.scrollTo(0,0)}
     if(name==='chat'){startChat();if(window.innerWidth>700)$('chatIn').focus()}
   }
   TABS.forEach(function(n,i){
@@ -762,6 +830,11 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
     });
   });
   $('gangPill').addEventListener('click',function(){showTab('gangs')});
+  $('guideBanner').hidden=lsGet('stelo-guide')==='1';
+  $('guideBanner').addEventListener('click',function(){showTab('guide')});
+  Array.prototype.forEach.call(document.querySelectorAll('[data-go]'),function(b){
+    b.addEventListener('click',function(){showTab(b.getAttribute('data-go'));window.scrollTo(0,0)});
+  });
 
   /* ---------- Toast ---------- */
   var toastEl=$('toast'),toastT=null;
@@ -782,9 +855,10 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
   function cleanName(s){return (s||'').replace(/\s+/g,' ').trim().slice(0,30)}
   function parseRef(str){
     var h=str||'',i=h.indexOf('#');if(i>=0)h=h.slice(i+1);
-    var j=h.indexOf('/'),id=cleanId(j<0?h:h.slice(0,j)),nm='';
-    if(j>=0){try{nm=decodeURIComponent(h.slice(j+1))}catch(e){nm=h.slice(j+1)}}
-    return {id:id,name:cleanName(nm)};
+    var parts=h.split('/'),id=cleanId(parts[0]),nm='',key=null;
+    if(parts.length>1){try{nm=decodeURIComponent(parts[1])}catch(e){nm=parts[1]}}
+    if(parts[2]&&parts[2].indexOf('k.')===0){var kk=parts[2].split('.');if(kk[1]&&kk[2])key={pk:kk[1],d:kk[2]}}
+    return {id:id,name:cleanName(nm),key:key};
   }
   function loadGangs(){try{var g=JSON.parse(lsGet('stelo-gangs')||'[]');return Array.isArray(g)?g.filter(function(x){return x&&cleanId(x.id)}):[]}catch(e){return []}}
   function saveGangs(){lsSet('stelo-gangs',JSON.stringify(gangs.slice(0,30)))}
@@ -799,9 +873,120 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
   function gangLink(){return location.origin+location.pathname+'#'+room+'/'+encodeURIComponent(gangName)}
   function setHash(){try{history.replaceState(null,'','#'+room+'/'+encodeURIComponent(gangName))}catch(e){}}
 
+  /* ---------- Mästare (signerade meddelanden) ----------
+     Ett gäng med mästare har ett id som börjar med "m-" och räknas fram ur mästarens publika nyckel.
+     Mästarens meddelanden signeras, så ingen annan kan ta bort folk eller byta namn i gänget. */
+  var enc=window.TextEncoder?new TextEncoder():null;
+  var subtle=(enc&&window.crypto&&crypto.subtle&&window.isSecureContext)?crypto.subtle:null;
+  function b64u(buf){var b=new Uint8Array(buf),s='';for(var i=0;i<b.length;i++)s+=String.fromCharCode(b[i]);return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+  function unb64u(str){str=String(str).replace(/-/g,'+').replace(/_/g,'/');while(str.length%4)str+='=';var s=atob(str),b=new Uint8Array(s.length);for(var i=0;i<s.length;i++)b[i]=s.charCodeAt(i);return b}
+  function idFromPk(pk){return Promise.resolve().then(function(){return subtle.digest('SHA-256',unb64u(pk))}).then(function(h){return 'm-'+b64u(h).slice(0,22)})}
+  var verKeys={},signKeys={};
+  function verifyObj(d){
+    if(!subtle||typeof d.sig!=='string'||typeof d.pk!=='string')return Promise.resolve(false);
+    var r=room;
+    return idFromPk(d.pk).then(function(id){
+      if(id!==r)return false;
+      if(!verKeys[d.pk])verKeys[d.pk]=subtle.importKey('raw',unb64u(d.pk),{name:'ECDSA',namedCurve:'P-256'},false,['verify']);
+      return verKeys[d.pk].then(function(k){
+        var c={};for(var x in d)if(x!=='sig')c[x]=d[x];
+        return subtle.verify({name:'ECDSA',hash:'SHA-256'},k,unb64u(d.sig),enc.encode(JSON.stringify(c)));
+      });
+    }).catch(function(){return false});
+  }
+  function myKey(){var g=findGang(room);return g&&g.key&&g.key.pk&&g.key.d?g.key:null}
+  function isOwner(){return !!(subtle&&room.indexOf('m-')===0&&myKey())}
+  function editOpen(){return room.indexOf('m-')!==0||meta.open}
+  function signingKey(k){
+    if(!signKeys[k.pk]){
+      var raw=unb64u(k.pk);
+      var jwk={kty:'EC',crv:'P-256',x:b64u(raw.slice(1,33)),y:b64u(raw.slice(33,65)),d:k.d,ext:true};
+      signKeys[k.pk]=subtle.importKey('jwk',jwk,{name:'ECDSA',namedCurve:'P-256'},false,['sign']);
+    }
+    return signKeys[k.pk];
+  }
+  function postSigned(obj){
+    var k=myKey();if(!k||!subtle)return;
+    obj.pk=k.pk;var str=JSON.stringify(obj);
+    signingKey(k).then(function(key){return subtle.sign({name:'ECDSA',hash:'SHA-256'},key,enc.encode(str))})
+      .then(function(sig){obj.sig=b64u(sig);post(obj,{last:-1},function(){})})
+      .catch(function(){toast('Kunde inte skicka som mästare')});
+  }
+  function newKeyPair(){
+    return subtle.generateKey({name:'ECDSA',namedCurve:'P-256'},true,['sign','verify']).then(function(kp){
+      return Promise.all([subtle.exportKey('raw',kp.publicKey),subtle.exportKey('jwk',kp.privateKey)]);
+    }).then(function(r){return {pk:b64u(r[0]),d:r[1].d}});
+  }
+  function applyMeta(d){
+    var ts=+d.ts||0;if(ts<=meta.ts)return;
+    meta.ts=ts;meta.bans={};meta.bn={};
+    (Array.isArray(d.bans)?d.bans:[]).slice(0,300).forEach(function(b){
+      b=cleanId(String(b));if(!b)return;
+      meta.bans[b]=1;meta.bn[b]=String((d.bn&&d.bn[b])||'').slice(0,20);
+    });
+    meta.open=d.open!==false;meta.owner=cleanId(String(d.owner||''));meta.ownerName=String(d.on||'').slice(0,20);
+    var nm=cleanName(d.name);if(nm){gangName=nm;rememberGang(room,nm);setHash()}
+    if(isOwner()){var g=findGang(room);g.bans=Object.keys(meta.bans);g.bn=meta.bn;g.open=meta.open;saveGangs()}
+    paintGang();renderPeople();paintMe();renderMaster();
+  }
+  function saveOwnerMeta(){
+    var g=findGang(room);
+    if(g){g.bans=Object.keys(meta.bans);g.bn=meta.bn;g.open=meta.open;saveGangs()}
+    meta.ts=Date.now();sendMeta();renderPeople();renderMaster();paintMe();
+  }
+  function claimKey(ref){
+    if(!ref.key||!subtle||!ref.id)return Promise.resolve(false);
+    return idFromPk(ref.key.pk).then(function(id){
+      if(id!==ref.id)return false;
+      return signingKey(ref.key).then(function(){
+        rememberGang(ref.id,ref.name||null);
+        findGang(ref.id).key={pk:ref.key.pk,d:ref.key.d};saveGangs();
+        return true;
+      });
+    }).catch(function(){delete signKeys[ref.key.pk];return false});
+  }
+  function openRef(ref,fromUi){
+    claimKey(ref).then(function(ok){
+      if(ref.id===room&&!ok){setHash();if(fromUi)showTab('meter');return}
+      connect(ref.id,ref.name||null);
+      if(ok)toast('👑 Du är nu mästare i '+gangName+' på den här enheten');
+      else if(fromUi)toast('Du är nu i '+gangName);
+      if(fromUi)showTab(ok?'gangs':'meter');
+    });
+  }
+  function masterLink(){var k=myKey();return location.origin+location.pathname+'#'+room+'/'+encodeURIComponent(gangName)+'/k.'+k.pk+'.'+k.d}
+  function doMove(mv){
+    if(!mv.to)return;
+    var old=room,carry={me:myLevel,shared:gotShared?Math.round(target):null};
+    gangs=gangs.filter(function(x){return x.id!==old});saveGangs();
+    connect(mv.to,mv.name||gangName,carry);
+    toast(gangName+' har fått en mästare och flyttat. Du följde med automatiskt.');
+  }
+  function upgradeGang(){
+    if(!subtle){toast('Den här webbläsaren kan inte skapa mästarnycklar');return}
+    var name=gangName,old=room,carry={me:myLevel,shared:Math.round(target)};
+    newKeyPair().then(function(k){return idFromPk(k.pk).then(function(id){
+      if(room!==old)return;
+      post({t:'mv',to:id,name:name,s:sid},{last:-1},function(){});
+      gangs=gangs.filter(function(x){return x.id!==old});
+      gangs.unshift({id:id,name:name,ts:Date.now(),key:k,bans:[],bn:{},open:true});saveGangs();
+      connect(id,name,carry);
+      toast('👑 '+name+' är uppgraderat och du är mästare. Alla som är inne följer med automatiskt.');
+    })}).catch(function(){toast('Något gick fel. Försök igen.')});
+  }
+  function twoStep(btn,txt,fn){
+    var orig=btn.textContent,armed=false,tm=null;
+    return function(e){
+      if(e)e.stopPropagation();
+      if(armed){clearTimeout(tm);armed=false;btn.textContent=orig;fn();return}
+      armed=true;btn.textContent=txt;tm=setTimeout(function(){armed=false;btn.textContent=orig},3500);
+    };
+  }
+
   /* ---------- Delning via ntfy ---------- */
   var room='',gangName='',base='',es=null,gen=0,seen={},replay=false,gotShared=false;
-  var people={},lastSharedLab=-1,myLevel=null;
+  var people={},lastSharedLab=-1,myLevel=null,nudgeQ={},openKey='',pendingMove=null;
+  var meta={ts:0,bans:{},bn:{},open:true,owner:'',ownerName:''};
   var syncEl=$('sync');
   function setSync(txt,live){syncEl.textContent=txt;syncEl.className=live?'sync live':'sync'}
 
@@ -835,7 +1020,15 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
     if(ps.timer)return;
     ps.timer=setTimeout(function(){ps.timer=null;flushPersonal(false)},Math.max(150,1500-(Date.now()-ps.t)));
   }
-  function sendMeta(){post({t:'m',name:gangName,s:sid},{last:-1},function(){})}
+  function sendMeta(){
+    if(room.indexOf('m-')===0){
+      if(!isOwner())return;
+      var bn={};Object.keys(meta.bans).forEach(function(b){bn[b]=meta.bn[b]||''});
+      postSigned({t:'m',name:gangName,bans:Object.keys(meta.bans),bn:bn,open:meta.open,owner:myId,on:myName||'',ts:meta.ts||Date.now()});
+      return;
+    }
+    post({t:'m',name:gangName,s:sid},{last:-1},function(){});
+  }
 
   function handle(m){
     if(!m||m.event!=='message'||!m.id||seen[m.id])return;
@@ -843,21 +1036,34 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
     var d;try{d=JSON.parse(m.message)}catch(x){return}
     if(!d||typeof d!=='object')return;
     var when=(m.time||Date.now()/1000)*1000;
+    var master=room.indexOf('m-')===0;
 
     if(d.t==='m'){
+      if(master){var r0=room;verifyObj(d).then(function(ok){if(ok&&r0===room)applyMeta(d)});return}
       var nm=cleanName(d.name);
       if(nm){gangName=nm;rememberGang(room,nm);setHash();paintGang()}
+      return;
+    }
+    if(d.t==='mv'){
+      if(master||typeof d.to!=='string'||d.to.indexOf('m-')!==0||d.s===sid)return;
+      var mv={to:cleanId(d.to),name:cleanName(d.name)};
+      if(replay)pendingMove=mv;else doMove(mv);
       return;
     }
     if(typeof d.pl==='number'&&d.id){
       var id=cleanId(d.id),n=String(d.n||'Någon').slice(0,20),v=clamp(d.pl,0,100);
       if(!id)return;
+      var bid=cleanId(String(d.bid||'')),by=(bid&&bid!==id)?String(d.by||'Någon').slice(0,20):'';
+      if(by&&!editOpen())return;
       var prev=people[id];
+      if(by&&prev)n=prev.n;
       people[id]={n:n,l:v,ts:when};
-      if(id===myId&&d.s!==sid&&!replay){myLevel=v;paintMe()}
-      if(id===myId&&replay){myLevel=v}
-      if(!replay&&d.s!==sid&&d.r&&(!prev||labelOf(prev.l)!==labelOf(v))){
-        notify(n+' känner sig '+PERS_PH[labelOf(v)]);
+      if(id===myId&&d.s!==sid){myLevel=v;if(!replay)paintMe()}
+      if(!replay&&d.s!==sid&&d.r&&!meta.bans[id]){
+        var lab=labelOf(v);
+        if(by&&id===myId)notify(by+' gjorde dig '+PERS_PH[lab]+'!');
+        else if(by){if(bid!==myId)notify(by+' tycker att '+n+' är '+PERS_PH[lab])}
+        else if(!prev||labelOf(prev.l)!==lab)notify(n+' känner sig '+PERS_PH[lab]);
       }
       if(!replay)renderPeople();
       return;
@@ -885,19 +1091,34 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
     es.onerror=function(){if(g===gen)setSync('Tappade anslutningen. Försöker igen…')};
   }
 
-  function connect(id,name){
+  function connect(id,name,carry){
     gen++;var g=gen;
     if(es){try{es.close()}catch(e){}es=null}
     clearTimeout(sh.timer);clearTimeout(ps.timer);sh.timer=ps.timer=null;
     sh.last=ps.last=-1;
+    for(var q in nudgeQ)clearTimeout(nudgeQ[q].t);nudgeQ={};
     room=id;base='https://ntfy.sh/'+room;
     var known=findGang(id);
     gangName=name||(known&&known.name)||(id===LEGACY?'Startgänget':'Namnlöst gäng');
     rememberGang(room,gangName);lsSet('stelo-last',room);setHash();
-    seen={};people={};gotShared=false;lastSharedLab=-1;myLevel=null;
-    paintGang();renderPeople();paintMe();
+    seen={};people={};gotShared=false;lastSharedLab=-1;myLevel=null;openKey='';pendingMove=null;
+    meta={ts:0,bans:{},bn:{},open:true,owner:'',ownerName:''};
+    if(isOwner()){
+      var gg=findGang(room);
+      (gg.bans||[]).forEach(function(b){meta.bans[b]=1});
+      meta.bn=gg.bn||{};meta.open=gg.open!==false;meta.owner=myId;meta.ownerName=myName;
+    }
+    paintGang();renderPeople();paintMe();renderMaster();
     setSync('Ansluter till '+gangName+'…');
     var start=Math.floor(Date.now()/1000);
+    function after(lastId){
+      if(pendingMove){var pm=pendingMove;pendingMove=null;doMove(pm);return}
+      if(carry&&carry.me!=null&&myLevel===null&&myName){myLevel=carry.me;people[myId]={n:myName,l:myLevel,ts:Date.now()};flushPersonal(true)}
+      if(!gotShared&&!dragging){if(carry&&carry.shared!=null){target=carry.shared;push(true)}else target=55}
+      if(isOwner()){meta.ts=Math.max(meta.ts+1,Date.now());meta.owner=myId;meta.ownerName=myName;sendMeta()}
+      paintGang();renderPeople();paintMe();renderMaster();
+      openStream(lastId||String(start),g);
+    }
     fetch(base+'/json?poll=1&since=12h').then(function(r){return r.text()}).then(function(txt){
       if(g!==gen)return;
       var lastId='';
@@ -907,14 +1128,11 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
         try{var m=JSON.parse(line);handle(m);if(m.event==='message'&&m.id)lastId=m.id}catch(x){}
       });
       replay=false;
-      if(!gotShared&&!dragging)target=55;
-      paintGang();renderPeople();paintMe();
-      openStream(lastId||String(start),g);
+      after(lastId);
     }).catch(function(){
       if(g!==gen)return;
       replay=false;
-      if(!gotShared&&!dragging)target=55;
-      openStream(String(start),g);
+      after('');
     });
   }
 
@@ -926,7 +1144,7 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
   }
   window.addEventListener('hashchange',function(){
     var r=parseRef(location.hash);
-    if(r.id&&r.id!==room)connect(r.id,r.name);
+    if(r.id&&(r.id!==room||r.key))openRef(r,true);
   });
 
   /* ---------- Gäng-UI ---------- */
@@ -935,6 +1153,7 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
   function paintGang(){
     $('gangPillName').textContent=gangName;
     $('gName').textContent=gangName;
+    $('renameGang').hidden=room.indexOf('m-')===0&&!isOwner();
     document.title='Stelometer · '+gangName;
     var n=activeCount();
     $('gCount').textContent=n?(n===1?'1 person har satt sin nivå senaste halvdygnet.':n+' personer har satt sin nivå senaste halvdygnet.'):'Ingen har satt en egen nivå här än.';
@@ -944,17 +1163,66 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
     var ul=$('glist');ul.textContent='';
     gangs.forEach(function(g){
       var li=el('li','gitem'+(g.id===room?' cur':''));
-      li.appendChild(el('span','gn',g.name));
+      li.appendChild(el('span','gn',(g.key?'👑 ':'')+g.name));
       if(g.id===room){li.appendChild(el('span','tag','Aktivt'))}
       else{
         var open=el('button','small','Öppna');open.type='button';
         open.addEventListener('click',function(){switchGang(g.id,g.name);showTab('meter')});
         var del=el('button','small','✕');del.type='button';del.setAttribute('aria-label','Ta bort '+g.name+' från listan');
-        del.addEventListener('click',function(){gangs=gangs.filter(function(x){return x.id!==g.id});saveGangs();renderGangs();toast(g.name+' är borttaget från din lista')});
+        var rm=function(){gangs=gangs.filter(function(x){return x.id!==g.id});saveGangs();renderGangs();toast(g.name+' är borttaget från din lista')};
+        if(g.key)del.addEventListener('click',twoStep(del,'Du tappar mästarnyckeln. Säker?',rm));
+        else del.addEventListener('click',rm);
         li.appendChild(open);li.appendChild(del);
       }
       ul.appendChild(li);
     });
+    renderMaster();
+  }
+  function renderMaster(){
+    var c=$('masterCard');if(!c)return;c.textContent='';
+    var master=room.indexOf('m-')===0,row;
+    if(master&&isOwner()){
+      c.appendChild(el('h2',null,'👑 Du är mästare'));
+      c.appendChild(el('p','muted','Tryck på någon under Personer för att ta bort hen från topplistan. Du kan också byta gängets namn och bestämma om man får ändra varandras stelhet.'));
+      row=el('div','row');
+      var tg=el('button',meta.open?'pri':null,'Ändra varandras stelhet: '+(meta.open?'på':'av'));tg.type='button';
+      tg.setAttribute('aria-pressed',meta.open?'true':'false');
+      tg.addEventListener('click',function(){
+        meta.open=!meta.open;saveOwnerMeta();
+        toast(meta.open?'Nu får alla ändra varandras stelhet':'Nu kan var och en bara ändra sin egen stelhet');
+      });
+      row.appendChild(tg);c.appendChild(row);
+      var bans=Object.keys(meta.bans);
+      if(bans.length){
+        c.appendChild(el('p','muted','Borttagna från topplistan'));
+        var ul=el('ul','bl');
+        bans.forEach(function(b){
+          var li=el('li');li.appendChild(el('span',null,meta.bn[b]||'Okänd'));
+          var u=el('button','small','Ångra');u.type='button';
+          u.addEventListener('click',function(){delete meta.bans[b];delete meta.bn[b];saveOwnerMeta();toast('Personen är tillbaka i topplistan')});
+          li.appendChild(u);ul.appendChild(li);
+        });
+        c.appendChild(ul);
+      }
+      row=el('div','row');
+      var ml=el('button',null,'Kopiera mästarlänk');ml.type='button';
+      ml.addEventListener('click',function(){copyText(masterLink()).then(function(ok){toast(ok?'Mästarlänken är kopierad. Öppna den på din andra enhet.':'Kunde inte kopiera')})});
+      row.appendChild(ml);c.appendChild(row);
+      c.appendChild(el('p','muted','Mästarlänken gör dig till mästare på en annan enhet, till exempel datorn. Dela den inte med andra, den ger full kontroll över gänget.'));
+    }else if(master){
+      c.appendChild(el('h2',null,'👑 Mästare'));
+      c.appendChild(el('p','muted',meta.ownerName?('Mästare i '+gangName+' är '+meta.ownerName+'.'):'Mästaren har inte varit inne det senaste halvdygnet.'));
+      c.appendChild(el('p','muted',editOpen()?'Alla får ändra varandras stelhet.':'Mästaren har stängt av att man ändrar varandras stelhet.'));
+    }else{
+      c.appendChild(el('h2',null,'👑 Ingen mästare än'));
+      c.appendChild(el('p','muted','Det här gänget skapades innan mästare fanns. Uppgradera så blir du mästare och kan ta bort personer och dubbletter. Alla som har sidan öppen, eller öppnar den gamla länken inom ett halvdygn, följer med automatiskt. Skicka gärna den nya länken till gänget också.'));
+      if(subtle){
+        row=el('div','row');
+        var ub=el('button','pri','Uppgradera och bli mästare');ub.type='button';
+        ub.addEventListener('click',twoStep(ub,'Säker? Tryck igen',upgradeGang));
+        row.appendChild(ub);c.appendChild(row);
+      }else c.appendChild(el('p','muted','Den här webbläsaren kan inte skapa mästarnycklar.'));
+    }
   }
   function copyText(txt){
     if(navigator.clipboard&&window.isSecureContext){
@@ -981,22 +1249,26 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
   $('renameForm').addEventListener('submit',function(e){
     e.preventDefault();
     var nm=cleanName($('renameIn').value);if(!nm)return;
-    gangName=nm;rememberGang(room,nm);setHash();paintGang();sendMeta();
+    gangName=nm;rememberGang(room,nm);setHash();paintGang();if(isOwner())meta.ts=Date.now();sendMeta();
     $('renameForm').hidden=true;toast('Gänget heter nu '+nm);
   });
   $('createForm').addEventListener('submit',function(e){
     e.preventDefault();
     var nm=cleanName($('createIn').value);if(!nm)return;
-    connect('g-'+rid(12),nm);sendMeta();
     $('createIn').value='';
-    toast(nm+' är skapat. Kopiera länken och skicka till gänget!');
+    if(!subtle){connect('g-'+rid(12),nm);sendMeta();toast(nm+' är skapat. Kopiera länken och skicka till gänget!');return}
+    newKeyPair().then(function(k){return idFromPk(k.pk).then(function(id){
+      gangs.unshift({id:id,name:nm,ts:Date.now(),key:k,bans:[],bn:{},open:true});saveGangs();
+      connect(id,nm);
+      toast('👑 '+nm+' är skapat och du är mästare. Kopiera länken och skicka till gänget!');
+    })}).catch(function(){connect('g-'+rid(12),nm);sendMeta()});
   });
   $('joinForm').addEventListener('submit',function(e){
     e.preventDefault();
     var raw=$('joinIn').value.trim(),r=parseRef(raw);
     if(!r.id||(raw.indexOf('#')<0&&/[:.]/.test(raw))){toast('Det där ser inte ut som en gänglänk. Den ska innehålla ett #.');return}
     $('joinIn').value='';
-    switchGang(r.id,r.name);showTab('meter');
+    openRef(r,true);
   });
 
   /* ---------- Notiser ---------- */
@@ -1058,6 +1330,9 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
     $('meNum').textContent=myLevel===null?'–':v;
     $('meName').textContent=myLevel===null?'Inte satt än':NAMES[labelOf(v)];
     $('meNote').textContent=myLevel===null?'Dra reglaget för att visa hur stel du känner dig. Du syns i topplistan för '+gangName+'.':'Alla i '+gangName+' ser din nivå direkt.';
+    var banned=!!meta.bans[myId];
+    meRange.disabled=banned;
+    if(banned)$('meNote').textContent='Mästaren har tagit bort dig från topplistan i '+gangName+'. Prata med mästaren om du vill vara med igen.';
   }
   var editingName=false;
   $('nameForm').addEventListener('submit',function(e){
@@ -1065,6 +1340,7 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
     var nm=$('nameIn').value.replace(/\s+/g,' ').trim().slice(0,20);if(!nm)return;
     myName=nm;lsSet('stelo-name',nm);editingName=false;
     if(people[myId]){people[myId].n=nm;ps.last=-1;flushPersonal(true)}
+    if(isOwner()){meta.ownerName=nm;meta.ts=Date.now();sendMeta()}
     paintMe();renderPeople();
   });
   $('renameMe').addEventListener('click',function(){editingName=true;$('nameIn').value=myName;paintMe();$('nameIn').focus()});
@@ -1085,11 +1361,48 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
     if(m<1)return 'nyss';if(m<60)return m+' min sedan';
     var h=Math.floor(m/60);return h+' h sedan';
   }
+  /* Samma namn räknas som samma person, även från olika telefoner och webbläsare. Senaste nivån gäller. */
   function sortedPeople(){
-    var arr=[],cut=Date.now()-12*3600*1000;
-    for(var k in people){if(people[k].ts<cut){delete people[k];continue}arr.push({id:k,n:people[k].n,l:people[k].l,ts:people[k].ts})}
+    var cut=Date.now()-12*3600*1000,groups={},arr=[];
+    for(var k in people){
+      var p=people[k];
+      if(p.ts<cut){delete people[k];continue}
+      if(meta.bans[k])continue;
+      var key=p.n.toLowerCase().replace(/\s+/g,' ').trim();
+      var g=groups[key];
+      if(!g)groups[key]={key:key,id:k,ids:[k],n:p.n,l:p.l,ts:p.ts};
+      else{g.ids.push(k);if(p.ts>g.ts){g.id=k;g.n=p.n;g.l=p.l;g.ts=p.ts}}
+    }
+    for(var gk in groups){
+      var x=groups[gk];
+      x.me=x.ids.indexOf(myId)>=0;
+      x.owner=!!meta.owner&&x.ids.indexOf(meta.owner)>=0;
+      arr.push(x);
+    }
     arr.sort(function(a,b){return b.l-a.l||b.ts-a.ts});
     return arr;
+  }
+  function nudge(p,delta){
+    unlock();
+    if(!myName){toast('Skriv ditt namn först, så vet de vem som ändrade');$('nameIn').focus();return}
+    if(!editOpen()){toast('Mästaren har stängt av att man ändrar varandra');return}
+    var id=p.id,q=nudgeQ[id],cur=q?q.v:(people[id]?people[id].l:p.l);
+    var v=clamp(Math.round(cur+delta),0,100);
+    people[id]={n:p.n,l:v,ts:Date.now()};
+    blip(delta>0?520+v*3:420-(100-v),.1,'triangle',.08);
+    renderPeople();
+    if(!q)q=nudgeQ[id]={};
+    q.v=v;clearTimeout(q.t);
+    q.t=setTimeout(function(){
+      delete nudgeQ[id];
+      post({t:'p',id:id,n:p.n,pl:v,s:sid,r:1,by:myName,bid:myId},{last:-1},function(){});
+    },700);
+    return v;
+  }
+  function kick(p){
+    p.ids.forEach(function(id){meta.bans[id]=1;meta.bn[id]=p.n});
+    openKey='';saveOwnerMeta();
+    toast(p.n+' är borttagen från topplistan');
   }
   function renderPeople(){
     var arr=sortedPeople(),ol=$('lb');
@@ -1097,25 +1410,52 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
     if(curTab!=='people')return;
     ol.textContent='';
     if(!arr.length){
-      var e=el('li','empty','Ingen i '+gangName+' har satt sin nivå än. Bli först!');ol.appendChild(e);
+      ol.appendChild(el('li','empty','Ingen i '+gangName+' har satt sin nivå än. Bli först!'));
       $('lbSub').textContent='Från stelast till mjukast.';return;
     }
-    $('lbSub').textContent='Från stelast till mjukast. Nivåer äldre än ett halvdygn försvinner.';
+    var owner=isOwner();
+    $('lbSub').textContent=(editOpen()?'Från stelast till mjukast. Tryck på någon för att göra hen stelare eller mjukare.':'Från stelast till mjukast.')+(owner?' Som mästare kan du också ta bort personer.':'');
     var medals=['🥇','🥈','🥉'];
     arr.forEach(function(p,i){
-      var li=el('li','lbRow'+(p.id===myId?' me':''));
+      var li=el('li','lbRow'+(p.me?' me':''));
+      var canAct=!p.me&&(editOpen()||owner);
+      if(canAct){
+        li.classList.add('click');li.tabIndex=0;li.setAttribute('role','button');
+        li.setAttribute('aria-expanded',openKey===p.key?'true':'false');
+        li.setAttribute('aria-label',p.n+', '+Math.round(p.l)+'. Tryck för val.');
+        var tog=function(){openKey=openKey===p.key?'':p.key;renderPeople()};
+        li.addEventListener('click',tog);
+        li.addEventListener('keydown',function(e){if(e.target===li&&(e.key==='Enter'||e.key===' ')){e.preventDefault();tog()}});
+      }
       li.appendChild(el('div','rank',medals[i]||String(i+1)));
       var mid=el('div');
       var nm=el('div','lbName');
       nm.appendChild(el('b',null,p.n));
-      if(p.id===myId)nm.appendChild(el('span','tag','du'));
+      if(p.me)nm.appendChild(el('span','tag','du'));
+      if(p.owner)nm.appendChild(el('span','tag','👑 mästare'));
       nm.appendChild(el('small',null,NAMES[labelOf(p.l)]+' · '+ago(p.ts)));
       mid.appendChild(nm);
-      var bar=el('div','bar'),fill=el('span');
-      fill.style.width=Math.max(3,p.l)+'%';fill.style.background='hsl('+hueOf(p.l)+' 88% 58%)';
-      bar.appendChild(fill);mid.appendChild(bar);
+      var bar=el('div','bar'),fl=el('span');
+      fl.style.width=Math.max(3,p.l)+'%';fl.style.background='hsl('+hueOf(p.l)+' 88% 58%)';
+      bar.appendChild(fl);mid.appendChild(bar);
       li.appendChild(mid);
       li.appendChild(el('div','lbNum',String(Math.round(p.l))));
+      if(canAct&&openKey===p.key){
+        var act=el('div','lbAct');
+        if(editOpen()){
+          var dn=el('button','small','🧊 Mjukare −10'),up=el('button','small','🔥 Stelare +10');
+          dn.type=up.type='button';
+          dn.addEventListener('click',function(e){e.stopPropagation();nudge(p,-10)});
+          up.addEventListener('click',function(e){e.stopPropagation();nudge(p,10)});
+          act.appendChild(dn);act.appendChild(up);
+        }
+        if(owner){
+          var kb=el('button','small danger','Ta bort från listan');kb.type='button';
+          kb.addEventListener('click',twoStep(kb,'Säker? Tryck igen',function(){kick(p)}));
+          act.appendChild(kb);
+        }
+        li.appendChild(act);
+      }
       ol.appendChild(li);
     });
   }
@@ -1224,13 +1564,18 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
     {id:'roar',k:['ryt','vral','raawr','rawr','raaawr','roar','morr','grrr','grr'],r:{
       a:['RAAAAWR! Oj, det var mycket. Ursäkta grannarna.','Grrr… nej vänta, det där var magen. RAAAWR! Där.'],
       h:['RAAAWR! Jag var redan i rytläge, så det kom gratis.']}},
+    {id:'master',k:['mastare','master','vem bestammer','ledare','kung','drottning','boss'],r:function(c){
+      if(room.indexOf('m-')!==0)return ['{gang} har ingen mästare än. Under fliken Gäng kan du uppgradera gänget och bli mästare själv. Kronan väntar.'];
+      if(isOwner())return ['Du är mästare i {gang}! Med stor makt kommer stort ansvar. Och en krona. Mest kronan.','Du är mästaren, {namn}. Jag bugar. Så gott det går med den här nacken.'];
+      return meta.ownerName?['Mästare i {gang} är '+meta.ownerName+'. Var snäll mot hen, hen kan ta bort dig från topplistan.','Det är '+meta.ownerName+' som bestämmer i {gang}. Jag bestämmer bara över min man.']:['Mästaren har inte synts till på ett tag. Jag misstänker en väldigt lång tupplur.'];
+    }},
     {id:'gangq',k:['vilket gang','mitt gang','ganget','hur manga','vilka ar med','vem ar med','medlem'],r:function(c){
       if(!c.antal)return ['Du är i {gang}. Ingen har satt sin egen nivå senaste halvdygnet. Väldigt lugnt gäng. Eller väldigt sovande.'];
       var names=c.ppl.slice(0,5).map(function(p){return p.n}).join(', ');
       return ['Du är i {gang}. {antal} har satt sin nivå nyligen, bland annat '+names+'.','I {gang} har {antal} personer visat hur stela de är. Modigt av dem.'];
     }},
     {id:'help',k:['hur funkar','vad kan du','hjalp','instruktion','hur anvander','vad gor stelometern','forklara','fragor'],r:{
-      a:['Dra i pilen på Mätaren för att visa hur stelt det är i gänget. Under Personer ställer du in din egen nivå och ser topplistan. Under Gäng skapar du nya gäng och delar länken. Och mig kan du fråga om nästan vad som helst. Typ.','Jag kan berätta hur stelt det är, vem som är stelast, ge tips, dra skämt och flytta mätaren åt dig. Skriv till exempel "sätt mätaren till 80".']}}
+      a:['Kolla fliken Guide, där står allt steg för steg. Kortversionen är att du drar i pilen på Mätaren, ställer in din egen nivå under Personer och skapar gäng under Gäng. Och mig kan du fråga om nästan vad som helst. Typ.','Jag kan berätta hur stelt det är, vem som är stelast, ge tips, dra skämt och flytta mätaren åt dig. Skriv till exempel "sätt mätaren till 80".']}}
   ];
   var YESNO_START=['ar','kan','ska','borde','har','blir','kommer','vill','far','gillar','tycker','maste','finns'];
   var YESNO={
@@ -1263,6 +1608,17 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
       target=n;vel+=(n>pos?1:-1)*120;push(true);hint.classList.add('gone');
       var lab=labelOf(n);
       return pick(['Klart! Jag drog mätaren till '+n+'. Nu är det '+SHARED_PH[lab]+' för alla i {gang}.','Fixat, '+n+' it is. '+QUIPS[lab],'Jag lutade mig mot pilen tills den stod på '+n+'. Alla i {gang} ser det nu.']);
+    }
+    var who=/\b(stelare|mjukare)\b/.exec(ft);
+    if(who){
+      var list=sortedPeople().filter(function(p){return !p.me}),hit=null;
+      list.forEach(function(p){var f=fold(p.n);if(f&&(' '+ft+' ').indexOf(' '+f+' ')>=0&&(!hit||f.length>fold(hit.n).length))hit=p});
+      if(hit){
+        if(!editOpen())return isOwner()?'Du har själv stängt av att man ändrar varandra, under Gäng. Slå på det igen så knuffar jag gärna.':'Mästaren har förbjudit att man ändrar varandra. Jag vågar inte. Hen är läskig.';
+        if(!myName)return 'Jag måste veta vem som ber om det. Skriv ditt namn under Personer först.';
+        var nv=nudge(hit,who[1]==='stelare'?20:-20);
+        return pick(who[1]==='stelare'?['Klart! Jag gjorde '+hit.n+' stelare. Hen står nu på '+nv+'. Hen kommer att veta att det var du.','Knuff utförd. '+hit.n+' är nu '+PERS_PH[labelOf(nv)]+'. Jag tar ingen skuld.']:['Fixat, '+hit.n+' är nu mjukare och står på '+nv+'. Vilken snäll handling.','Jag gav '+hit.n+' en virtuell massage. Ny nivå '+nv+'.']);
+      }
     }
     if(/\b(stelare|hoj|upp)\b/.test(ft)&&/\b(gor|dra|mataren|matare|lite|mer)\b/.test(ft)){
       var u=clamp(Math.round(target)+20,0,100);target=u;push(true);
@@ -1319,7 +1675,7 @@ input.lvl:focus-visible{outline:3px dashed #1d1424;outline-offset:4px}
   /* ---------- Start ---------- */
   paintNotif();
   var startRef=parseRef(location.hash);
-  if(startRef.id){connect(startRef.id,startRef.name)}
+  if(startRef.id){if(startRef.key)openRef(startRef);else connect(startRef.id,startRef.name)}
   else{
     var lastRoom=cleanId(lsGet('stelo-last')||'');
     var lg=lastRoom&&findGang(lastRoom);
