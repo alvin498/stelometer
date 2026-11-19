@@ -1,5 +1,7 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
-<meta name="claude:viewport-fit-sides" content="cover">
+<!doctype html>
+<html lang="sv"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Stelometer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -124,6 +126,7 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
   .wedge{transition:none}
 }
 </style>
+</head><body>
 
 <div class="bg" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
 <canvas id="fx" aria-hidden="true"></canvas>
@@ -527,49 +530,42 @@ button:focus-visible{outline:3px dashed var(--line);outline-offset:4px}
     requestAnimationFrame(frame);
   }
 
-  var sid=Math.random().toString(36).slice(2,10),syncEl=$('sync'),ref=null,wBusy=false,lastSent=-1,pendTimer=null,gotRemote=false,remoteLevel=55,canWrite=true;
+  var sid=Math.random().toString(36).slice(2,10),syncEl=$('sync'),gotRemote=false,sendT=0,pendTimer=null,lastSent=-1;
   function setSync(txt,live){syncEl.textContent=txt;syncEl.className=live?'sync live':'sync'}
+  function h32(s){var h=5381;for(var i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)}
+  var room=(location.hash||'').replace(/[^-_A-Za-z0-9]/g,'').slice(0,64);
+  if(!room)room='stelo-'+h32(location.origin+location.pathname);
+  var base='https://ntfy.sh/'+room;
   function flush(){
-    if(!ref||wBusy||!canWrite)return;
     var v=Math.round(target);
     if(v===lastSent)return;
-    wBusy=true;lastSent=v;
-    ref.set({level:v,by:sid,at:Date.now()}).then(function(){
-      wBusy=false;
-      if(Math.round(target)!==lastSent)flush();
-    },function(){
-      wBusy=false;canWrite=false;target=remoteLevel;
-      setSync('Du ser nivån live men kan inte ändra den.',true);
-    });
+    lastSent=v;sendT=Date.now();
+    fetch(base,{method:'POST',body:JSON.stringify({l:v,s:sid})}).then(function(r){
+      if(r.status===429){lastSent=-1;setTimeout(flush,5000)}
+    },function(){lastSent=-1;setSync('Kunde inte skicka. Bara du ser ändringen just nu.')});
   }
   function push(now){
-    if(!ref||!canWrite)return;
     if(now){clearTimeout(pendTimer);pendTimer=null;flush();return}
     if(pendTimer)return;
-    pendTimer=setTimeout(function(){pendTimer=null;flush()},140);
+    pendTimer=setTimeout(function(){pendTimer=null;flush()},Math.max(150,1500-(Date.now()-sendT)));
   }
-  window.push=push;
+  function onMsg(e){
+    var m,d;
+    try{m=JSON.parse(e.data);d=JSON.parse(m.message)}catch(x){return}
+    if(!d||typeof d.l!=='number'||d.s===sid)return;
+    gotRemote=true;
+    if(!dragging){target=clamp(d.l,0,100);hint.classList.add('gone')}
+  }
   setTimeout(function(){if(!gotRemote)target=55},450);
-  if(!window.claude||!window.claude.use){setSync('Delning är inte tillgänglig här. Bara du ser ändringar.')}
+  if(!window.EventSource){setSync('Din webbläsare saknar stöd för delning. Bara du ser ändringar.')}
   else{
-    window.claude.use('db').then(function(db){
-      if(!db){setSync('Delning är inte tillgänglig här. Bara du ser ändringar.');return}
-      ref=db.collection('state').doc('meter');
-      var to=setTimeout(function(){if(!gotRemote)setSync('Når inte den delade nivån än…')},10000);
-      ref.onSnapshot(function(s){
-        if(!s.fromCache)clearTimeout(to);
-        var d=s.exists?s.data():null,first=!gotRemote;
-        gotRemote=true;
-        if(canWrite)setSync('Live: alla ser samma nivå',true);
-        if(d&&typeof d.level==='number'){
-          remoteLevel=d.level;
-          if(d.by!==sid&&!dragging){target=clamp(d.level,0,100);hint.classList.add('gone')}
-        }else if(first){target=55}
-      },function(){setSync('Anslutningen till den delade nivån bröts. Bara du ser ändringar.')});
-    },function(){setSync('Delning är inte tillgänglig här. Bara du ser ändringar.')});
+    setSync('Ansluter till den delade nivån…');
+    var es=new EventSource(base+'/sse?since=latest');
+    es.addEventListener('open',function(){setSync('Live: alla med länken ser samma nivå',true)});
+    es.addEventListener('message',onMsg);
+    es.onerror=function(){setSync('Tappade anslutningen. Försöker igen…')};
   }
   requestAnimationFrame(function(n){last=n;frame(n)});
 })();
 </script>
-
 </body></html>
